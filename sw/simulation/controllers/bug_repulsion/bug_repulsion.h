@@ -52,10 +52,20 @@ public:
 	void follow_line(float* v_x, float* v_y);
 	void update_follow_laser(void);
 	void update_direction(const uint16_t ID);
+	void update_status(const uint16_t ID);
+	float get_agent_dist(const uint16_t ID1, const uint16_t ID2);
+	bool avoided_obstacle(const uint16_t ID);
+	void follow_wall(const uint16_t ID, float* v_x, float* v_y);
+	void repulse_swarm(const uint16_t ID, float* v_x, float* v_y);
+	void wall_follow_init(const uint16_t ID);
+	void update_start_laser(void);
+	void reset_wall_follower(void);
+	// float get_laser_min(const uint16_t ID);
 
 	random_generator rg;
-	Point agent_pos, goal, random_point;	// agent position point struct
+	Point agent_pos, goal, random_point, start_wall_avoid, other_agent_pos;	// agent position point struct
 	Line line_to_goal; // line to goal waypoint
+	OmniscientObserver o; // used to get relative position of other agents
 
 	std::vector<float> state;
 	std::vector<laser_ray> laser_rays; // contains all laser ray objects
@@ -63,7 +73,7 @@ public:
 
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
 	float update_time = 10.0; // every x seconds a new waypoint is generated, if the goal isn't found before then
-	float dist_reached_goal = 0.5; // distance threshold for classifying as finding the goal
+	float dist_reached_goal = 0.3; // distance threshold for classifying as finding the goal
 
 	float rand_p = 0.0;
 	float omega = 0.2;
@@ -82,6 +92,24 @@ public:
 
 	float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
 	float desired_velocity = 0.5; // [m/s]
+
+	float laser_warning = 1.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
+	float swarm_warning = 1.0; // x [m] before a distance to another agent is classified as dangerous
+	std::vector<uint> closest_agents; // list of other agent IDs, first is closest other agent
+	int status = 0; // status of avoidance, 0 = corridor following to wp, 1 = wall-following, 2 = repulsion (swarm)
+	int previous_status = 0; // used to initialize when changing status
+	float min_obs_avoid_thres = 1.0; // minimum distance to have moved when avoiding obstacle
+
+	bool search_left = false; // searching direction when wall-following
+	int start_laser = 0; // laser at which we start 'looking', see paper
+	int start_laser_corrected = 0; // to avoid oscillations
+	int follow_laser = 0; // the actual laser direction in which we are moving
+	int max_reached_laser = 0; // max reached laser it had to go to during safe wall-following
+	
+	float max_turns = 2; // max number of turns that can be made to avoid an object
+	float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
+	float k_swarm_avoidance = 10.0; // used for repulsion between agents
+
 };
 
 #endif /*BUG_REPULSION_H*/

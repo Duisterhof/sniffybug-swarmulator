@@ -18,6 +18,7 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
     generate_new_wp(ID);
+    status = 0;
   }
   else if (simtime_seconds == 0.0)
   {
@@ -28,7 +29,277 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
     update_direction(ID);
   }
 
-  follow_line(&v_x, &v_y);
+  update_status(ID); // get new status
+  switch(status)
+  {
+    case 0:
+      follow_line(&v_x, &v_y);
+      break;
+    case 1:
+      follow_wall(ID, &v_x,&v_y);
+      break;
+    case 2:
+      repulse_swarm(ID, &v_x, &v_y);
+      break;
+  }
+  terminalinfo::debug_msg(std::to_string(status));
+  // terminalinfo::debug_msg(std::to_string(v_y));
+  
+}
+
+void bug_repulsion::wall_follow_init(const uint16_t ID)
+{
+  std::vector<float> lasers =  s.at(ID)->laser_ranges;
+  int min_laser_idx = std::distance(lasers.begin(),std::min_element(lasers.begin(),lasers.end())); // min laser idx
+  start_laser = min_laser_idx ;
+  terminalinfo::debug_msg(std::to_string(lasers[min_laser_idx]));
+  cap_laser(&start_laser);
+  max_reached_laser = start_laser;
+
+  int right_idx = start_laser + 1;
+  int left_idx = start_laser - 1;
+  cap_laser(&right_idx);
+  cap_laser(&left_idx);
+
+  float heading_right = right_idx*M_PI_2 + s.at(ID)->get_orientation();
+  float heading_left = left_idx*M_PI_2 +s.at(ID)->get_orientation();
+
+  positive_angle(&heading_right);
+  positive_angle(&heading_left);
+
+  float heading_to_wp = get_heading_to_point(agent_pos,goal);
+  positive_angle(&heading_to_wp);
+
+  if (abs(heading_to_wp-heading_left) < abs(heading_to_wp-heading_right))
+  {
+    search_left = true;
+  }
+  else
+  {
+    search_left = false;
+  }
+
+}
+
+void bug_repulsion::update_start_laser(void)
+{
+  if (search_left)
+  {
+    if (max_reached_laser < start_laser)
+    {
+      start_laser_corrected = max_reached_laser + 1;
+    }
+    else
+    {
+      start_laser_corrected = start_laser;
+    }
+    
+  }
+  else
+  {
+    if (max_reached_laser > start_laser)
+    {
+      start_laser_corrected = max_reached_laser - 1;
+    }
+    else
+    {
+      start_laser_corrected = start_laser;
+    }
+    
+  }
+}
+
+void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
+{
+
+  update_start_laser(); // avoid osscialations
+  int local_laser_idx = start_laser_corrected;
+  int forbidden_direction = follow_laser - 2;
+  cap_laser(&forbidden_direction);
+  if (search_left == false)
+  {
+    for (int i = start_laser_corrected; i < (start_laser_corrected+4); i++)
+    {
+
+      local_laser_idx = i;
+      cap_laser(&local_laser_idx);
+
+      if (local_laser_idx != forbidden_direction)
+      {
+        if (abs(start_laser-i) > max_turns)
+        {
+          reset_wall_follower();
+        }
+
+        if (s.at(ID)->laser_ranges[local_laser_idx] > laser_warning)
+        {
+          if (local_laser_idx > max_reached_laser)
+          {
+            max_reached_laser = local_laser_idx;
+          }
+          break;
+        }
+      }
+    }
+  }
+  else
+  {
+    for (int i = start_laser_corrected; i > (start_laser_corrected-4); i--)
+    {
+      local_laser_idx = i;
+      cap_laser(&local_laser_idx);
+      
+      if (local_laser_idx != forbidden_direction)
+      {
+        if (abs(start_laser-i) > max_turns)
+        {
+          reset_wall_follower();
+        }
+
+        if (s.at(ID)->laser_ranges[local_laser_idx] > laser_warning)
+        {
+          if (local_laser_idx < max_reached_laser)
+          {
+            max_reached_laser = local_laser_idx;
+          }
+          break;
+        }
+      }
+    }
+  }
+  follow_laser = local_laser_idx;
+  *(v_x) = cosf(follow_laser*M_PI_2)*desired_velocity;
+  *(v_y) = sinf(follow_laser*M_PI_2)*desired_velocity;
+
+
+}
+
+void bug_repulsion::reset_wall_follower(void)
+{
+  if (search_left)
+  {
+    search_left = false;
+  }
+  else
+  {
+    search_left = true;
+  }
+  max_reached_laser = start_laser;
+  
+}
+
+void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
+{
+  *(v_x) = 0;
+  *(v_y) = 0;
+
+  // attraction to waypoint
+  float local_psi = get_heading_to_point(agent_pos,goal) ;
+  positive_angle(&local_psi);
+  *(v_x) = cosf(local_psi)*desired_velocity;
+  *(v_y) = sinf(local_psi)*desired_velocity;
+
+
+  // add repulsion from lasers      
+  for ( int i = 0; i<4; i++)
+  {
+    if ( s.at(ID)->laser_ranges[i] < laser_warning)
+    {
+      float laser_heading = laser_headings[i];
+      float heading_away_from_laser = laser_heading - M_PI;
+      *(v_x) += cosf(heading_away_from_laser)*k_swarm_laser_rep*(laser_warning-s.at(ID)->laser_ranges[i]);
+      *(v_y) += sinf(heading_away_from_laser)*k_swarm_laser_rep*(laser_warning-s.at(ID)->laser_ranges[i]);
+    }
+  }
+
+  // repulsion from close agents
+  for (uint i =0; i<closest_agents.size(); i++)
+  {
+    if (get_agent_dist(ID,closest_agents[i]) < swarm_warning)
+    {
+      other_agent_pos.x = s.at(closest_agents[i])->state[1];
+      other_agent_pos.y = s.at(closest_agents[i])->state[0];
+      float heading_to_other_agent = get_heading_to_point(agent_pos,other_agent_pos) - s.at(ID)->get_orientation();
+      float heading_away_from_agent = heading_to_other_agent - M_PI;
+      *(v_x) += cosf(heading_away_from_agent)*k_swarm_avoidance*(swarm_warning-get_agent_dist(ID,closest_agents[i]));
+      *(v_y) += sinf(heading_away_from_agent)*k_swarm_avoidance*(swarm_warning-get_agent_dist(ID,closest_agents[i]));
+    }
+  }
+  
+  float vector_size = sqrt(pow(*(v_x),2)+pow(*(v_y),2));
+
+  *(v_x) = *(v_x)/vector_size*desired_velocity;
+  *(v_y) = *(v_y)/vector_size*desired_velocity;
+  // if (abs(*(v_x)) > abs(*(v_y)))
+  // {
+  //   *(v_x) = desired_velocity;
+  //   *(v_y) = 0.0;
+  // }
+  // else
+  // {
+  //   *(v_y) = desired_velocity;
+  //   *(v_x) = 0.0;
+  // }
+  
+}
+
+
+void bug_repulsion::update_status(const uint16_t ID)
+{
+  closest_agents = o.request_closest(ID);
+  
+  if (closest_agents.size() > 0 && get_agent_dist(closest_agents[0],ID) < swarm_warning)
+  {
+    status = 2;
+  }
+  else if (previous_status == 2)
+  {
+    generate_new_wp(ID);
+    status = 0;
+  }
+  else if (previous_status == 0 && (s.at(ID)->laser_ranges[lower_idx] < laser_warning || s.at(ID)->laser_ranges[upper_idx] < laser_warning))
+  {
+    status = 1;
+    start_wall_avoid = agent_pos;
+    wall_follow_init(ID);
+  }
+  // else if (previous_status == 1 && avoided_obstacle(ID))
+  // {
+  //   status = 0;
+  // }
+
+  previous_status = status;
+
+}
+
+float bug_repulsion::get_agent_dist(const uint16_t ID1, const uint16_t ID2)
+{
+  return(sqrtf(pow(s.at(ID1)->state[0]-s.at(ID2)->state[0],2)+pow(s.at(ID1)->state[1]-s.at(ID2)->state[1],2)));
+}
+
+// float bug_repulsion::get_laser_min(const uint16_t ID)
+// {
+//   std::vector<float> lasers =  s.at(ID)->laser_ranges;
+//   int min_laser_idx = std::distance(lasers.begin(),std::min_element(lasers.begin(),lasers.end())); // min laser idx
+//   return(lasers[min_laser_idx]);
+// }
+
+bool bug_repulsion::avoided_obstacle(const uint16_t ID)
+{
+  if (get_distance_to_line(line_to_goal,agent_pos) > line_max_dist)
+  {
+    return false;
+  }
+  else if (getDistance(start_wall_avoid,agent_pos) > min_obs_avoid_thres && s.at(ID)->laser_ranges[lower_idx] > laser_warning && s.at(ID)->laser_ranges[upper_idx] > laser_warning   )  
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+  
+  
 }
 
 // updates individual and swarm best wps
@@ -62,6 +333,7 @@ void bug_repulsion::follow_line(float* v_x, float* v_y)
   following_heading = following_laser*M_PI_2;
   *(v_x) = cosf(following_heading)*desired_velocity;
   *(v_y) = sinf(following_heading)*desired_velocity;
+
 
 }
 

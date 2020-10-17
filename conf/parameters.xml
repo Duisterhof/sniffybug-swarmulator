@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<parameters xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="parameters.xsd">
+  <!-- Simulation -->
+  <simulation_updatefreq>10</simulation_updatefreq>
+  <simulation_realtimefactor>2</simulation_realtimefactor>
+  <time_limit>298</time_limit>
+  <!-- (seconds). Use time_limit > 0 to set a limit. If = 0, then the simulation runs indefinitely. -->
+  <environment>image_testing</environment>
+  <!-- See the folder conf/environments/ for available environments. 
+       Create your own or use "random" to generate a random map at runtime -->
+  <!-- Animation -->
+  <agent_initialization>in_area</agent_initialization>
+  <window_width>800</window_width>
+  <window_height>800</window_height>
+  <scale>0.1</scale>
+  <mouse_drag_speed>0.3</mouse_drag_speed>
+  <mouse_zoom_speed>0.5</mouse_zoom_speed>
+  <zoom>-40</zoom>
+  <!-- Start up zoom, bounded -90 and 9 -->
+  <animation_updatefreq>25</animation_updatefreq>
+  <!-- Logger -->
+  <logger_updatefreq>2</logger_updatefreq>
+  <!-- Additional parameters -->
+  <policy>conf/policies/gas_params.txt</policy>
+  <policy_shape>conf/policies/gas_shape.txt</policy_shape>
+  <fitness>source_distance</fitness>
+  <gas_seeking>True</gas_seeking>
+  <gas_euclidean>False</gas_euclidean>
+  <env_pipe_mode>True</env_pipe_mode>
+  <!-- debug mode within the gas seeking application, feeds distance instead of gas readings, runs faster for debugging-->
+  <!--new_parameter_name>default value</new_parameter_name-->
+</parameters>

@@ -47,6 +47,7 @@ public:
   Point best_agent_pos = {.x = 0.0,.y = 0.0}; // position of best position agent has seen 
   Point goal = {.x= 0.0,.y=0.0}; // goal position in PSO
   float best_agent_gas = -1.0; // best found gas concentration
+  Line line;
 
   /**
    * Returns the position of the agent along a certain dimension (i.e., North(0) and East(1))

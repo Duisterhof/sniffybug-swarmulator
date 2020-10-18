@@ -497,6 +497,12 @@ inline static float get_heading_to_point(Point agent, Point goal)
   return psi;
 }
 
+inline static void point_on_line(Point* agent_start, Line line)
+{
+  agent_start->x = (line.b*(line.b*agent_start->x-line.a*agent_start->y)-line.a*line.c)/(pow(line.a,2)+pow(line.b,2));
+  agent_start->y = (line.a*(-line.b*agent_start->x+line.a*agent_start->y)-line.b*line.c)/(pow(line.a,2)+pow(line.b,2));
+}
+
 /**
  * Given three colinear points p, q, r, the function checks if point q lies on line segment 'pr'
  *

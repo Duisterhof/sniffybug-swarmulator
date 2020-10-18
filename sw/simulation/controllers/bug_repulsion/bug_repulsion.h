@@ -49,21 +49,23 @@ public:
 	void load_all_lasers(const uint16_t ID);
 	void update_best_wps(const uint16_t ID);
 	void get_new_line(void);
-	void follow_line(float* v_x, float* v_y);
+	void follow_line(const uint16_t ID, float* v_x, float* v_y);
 	void update_follow_laser(void);
 	void update_direction(const uint16_t ID);
 	void update_status(const uint16_t ID);
 	float get_agent_dist(const uint16_t ID1, const uint16_t ID2);
-	bool avoided_obstacle(const uint16_t ID);
 	void follow_wall(const uint16_t ID, float* v_x, float* v_y);
 	void repulse_swarm(const uint16_t ID, float* v_x, float* v_y);
 	void wall_follow_init(const uint16_t ID);
 	void update_start_laser(void);
 	void reset_wall_follower(void);
+	bool free_to_goal(const uint16_t ID);
+	void check_passed_goal(const uint16_t ID);
+	bool avoided_obstacle(const uint16_t ID);
 	// float get_laser_min(const uint16_t ID);
 
 	random_generator rg;
-	Point agent_pos, goal, random_point, start_wall_avoid, other_agent_pos;	// agent position point struct
+	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position;	// agent position point struct
 	Line line_to_goal; // line to goal waypoint
 	OmniscientObserver o; // used to get relative position of other agents
 
@@ -72,13 +74,16 @@ public:
 	float laser_headings[4] = {0,M_PI_2,M_PI,3*M_PI_2};	// headings in body frame of all lasers
 
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
-	float update_time = 10.0; // every x seconds a new waypoint is generated, if the goal isn't found before then
-	float dist_reached_goal = 0.3; // distance threshold for classifying as finding the goal
+	float update_time = 40.0; // every x seconds a new waypoint is generated, if the goal isn't found before then
+	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
 
 	float rand_p = 0.0;
 	float omega = 0.2;
 	float phi_p = 0.3;
 	float phi_g = 2.0;
+
+	float old_vx = 0.0;
+	float old_vy = 0.0;
 
 	// line following
 	float line_heading; // heading from agent_pos to goal
@@ -93,12 +98,12 @@ public:
 	float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
 	float desired_velocity = 0.5; // [m/s]
 
-	float laser_warning = 1.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
-	float swarm_warning = 1.0; // x [m] before a distance to another agent is classified as dangerous
+	float laser_warning = 1.0; // x [m] before a laser range value is seen as dangerous --> avoid stuff
+	float swarm_warning = 0.8; // x [m] before a distance to another agent is classified as dangerous
 	std::vector<uint> closest_agents; // list of other agent IDs, first is closest other agent
 	int status = 0; // status of avoidance, 0 = corridor following to wp, 1 = wall-following, 2 = repulsion (swarm)
 	int previous_status = 0; // used to initialize when changing status
-	float min_obs_avoid_thres = 1.0; // minimum distance to have moved when avoiding obstacle
+	float min_obs_avoid_thres = 2.0; // minimum distance to have moved when avoiding obstacle
 
 	bool search_left = false; // searching direction when wall-following
 	int start_laser = 0; // laser at which we start 'looking', see paper
@@ -108,7 +113,7 @@ public:
 	
 	float max_turns = 2; // max number of turns that can be made to avoid an object
 	float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
-	float k_swarm_avoidance = 10.0; // used for repulsion between agents
+	float k_swarm_avoidance = 15.0; // used for repulsion between agents
 
 };
 

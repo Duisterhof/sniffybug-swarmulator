@@ -14,6 +14,9 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
   agent_pos.y = state[0];
   load_all_lasers(ID); // modelling multirangers
   update_best_wps(ID); // use gas sensing to update the best seen points 
+  closest_agents = o.request_closest(ID);
+
+  s.at(ID)->line = line_to_goal;
 
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
@@ -29,11 +32,12 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
     update_direction(ID);
   }
 
-  update_status(ID); // get new status
+  // update_status(ID); // get new status
+  status = 2;
   switch(status)
   {
     case 0:
-      follow_line(&v_x, &v_y);
+      follow_line(ID,&v_x, &v_y);
       break;
     case 1:
       follow_wall(ID, &v_x,&v_y);
@@ -42,44 +46,70 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
       repulse_swarm(ID, &v_x, &v_y);
       break;
   }
-  terminalinfo::debug_msg(std::to_string(status));
+  terminalinfo::debug_msg(std::to_string(search_left));
   // terminalinfo::debug_msg(std::to_string(v_y));
   
+  // v_x = 0.9*old_vx + 0.1*v_x;
+  // v_y = 0.9*old_vy + 0.1*v_y;
+
+  // old_vx = v_x;
+  // old_vy = v_y;
+
 }
 
 void bug_repulsion::wall_follow_init(const uint16_t ID)
 {
-  std::vector<float> lasers =  s.at(ID)->laser_ranges;
-  int min_laser_idx = std::distance(lasers.begin(),std::min_element(lasers.begin(),lasers.end())); // min laser idx
-  start_laser = min_laser_idx ;
-  terminalinfo::debug_msg(std::to_string(lasers[min_laser_idx]));
-  cap_laser(&start_laser);
-  max_reached_laser = start_laser;
+  float temp_line_heading = get_heading_to_point(agent_pos,goal); // used to follow the line
+  float temp_corrected_heading = temp_line_heading - s.at(ID)->get_orientation();
+  positive_angle(&temp_corrected_heading);
 
-  int right_idx = start_laser + 1;
-  int left_idx = start_laser - 1;
-  cap_laser(&right_idx);
-  cap_laser(&left_idx);
+  int lower_idx_temp = (int)(temp_corrected_heading /M_PI_2);
+  int upper_idx_temp = lower_idx_temp+1;
+  cap_laser(&lower_idx_temp);
+  cap_laser(&upper_idx_temp);
 
-  float heading_right = right_idx*M_PI_2 + s.at(ID)->get_orientation();
-  float heading_left = left_idx*M_PI_2 +s.at(ID)->get_orientation();
+  float lower_heading = lower_idx_temp*M_PI_2 + s.at(ID)->get_orientation();
+  float upper_heading = upper_idx_temp*M_PI_2 + s.at(ID)->get_orientation();
+  positive_angle(&lower_heading);
+  positive_angle(&upper_heading);
 
-  positive_angle(&heading_right);
-  positive_angle(&heading_left);
-
-  float heading_to_wp = get_heading_to_point(agent_pos,goal);
-  positive_angle(&heading_to_wp);
-
-  if (abs(heading_to_wp-heading_left) < abs(heading_to_wp-heading_right))
+  if ( abs(temp_corrected_heading-lower_heading) > abs(temp_corrected_heading-upper_heading))
   {
+    start_laser = upper_idx_temp;
     search_left = true;
   }
   else
   {
+    start_laser = lower_idx_temp;
     search_left = false;
   }
-
+  
 }
+
+bool bug_repulsion::free_to_goal(const uint16_t ID)
+{
+  if (s.at(ID)->laser_ranges[lower_idx] > laser_warning && s.at(ID)->laser_ranges[upper_idx] > laser_warning)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+  
+  
+}
+
+void bug_repulsion::check_passed_goal(const uint16_t ID)
+{
+  float current_heading_to_goal = get_heading_to_point(agent_pos,goal);
+  float following_heading = following_laser*M_PI_2 + s.at(ID)->get_orientation();
+  if (abs(current_heading_to_goal-following_heading) > M_PI_2)
+  {
+    update_direction(ID);
+  }
+}
+
 
 void bug_repulsion::update_start_laser(void)
 {
@@ -93,7 +123,6 @@ void bug_repulsion::update_start_laser(void)
     {
       start_laser_corrected = start_laser;
     }
-    
   }
   else
   {
@@ -105,20 +134,87 @@ void bug_repulsion::update_start_laser(void)
     {
       start_laser_corrected = start_laser;
     }
-    
   }
+}
+
+bool bug_repulsion::avoided_obstacle(const uint16_t ID)
+{
+  // if (get_distance_to_line(line_to_goal,agent_pos) > line_max_dist)
+  // {
+  //   return false;
+  // }
+  // else if (getDistance(start_wall_avoid,agent_pos) > min_obs_avoid_thres)  
+  // {
+  //   return true;
+  // }
+  // else
+  // {
+  //   return false;
+  // }
+  // bool avoiding = false;
+  // std::tuple<bool,Point> intersect_return_obs;
+
+  // Point laser_temp, goal_extended;
+  // goal_extended = {.x= line_to_goal.p0.x + 100*(line_to_goal.p1.x-line_to_goal.p0.x), .y= line_to_goal.p0.y + 100*(line_to_goal.p1.y-line_to_goal.p0.y)};
+  // // goal_extended = goal;
+  // float start_goal_dist = getDistance(start_wall_avoid,goal_extended);
+
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   if (s.at(ID)->laser_ranges[i] > 2.5)
+  //   {
+  //     float laser_glob_heading = i*M_PI_2 + s.at(ID)->get_orientation();
+  //     positive_angle(&laser_glob_heading);
+  //     laser_temp.x = agent_pos.x + sinf(laser_glob_heading)*100;
+  //     laser_temp.y = agent_pos.y + cosf(laser_glob_heading)*100;
+  //     //get intersection point and a bool if it's on the wall or not
+  //     intersect_return_obs = getIntersect(agent_pos,laser_temp,line_to_goal.p0,goal_extended);
+  //     bool on_line = std::get<0>(intersect_return_obs);
+  //     Point intersect = std::get<1>(intersect_return_obs);
+
+  //     if (on_line)
+  //     {
+  //       float dist = getDistance(intersect,goal_extended);
+  //       if ((start_goal_dist-dist)> min_obs_avoid_thres)
+  //       {
+  //         avoiding = true;
+  //       }
+  //     }
+  //   }
+  // }
+  bool avoiding = false;
+  for (int i = 0; i < 4; i++)
+  {
+    if (s.at(ID)->laser_ranges[i] > 2.5)
+    {
+      float laser_glob_heading = i*M_PI_2 + s.at(ID)->get_orientation();
+      positive_angle(&laser_glob_heading);
+
+      float goal_heading = get_heading_to_point(agent_pos,goal);
+      positive_angle(&goal_heading);
+
+      float diff =  goal_heading - laser_glob_heading;
+
+      if ( abs(diff < M_PI_4))
+      {
+        avoiding = true;
+      }
+    }
+  }
+
+  return avoiding;
 }
 
 void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
 {
-
+  // terminalinfo::debug_msg(std::to_string(search_left));
   update_start_laser(); // avoid osscialations
   int local_laser_idx = start_laser_corrected;
-  int forbidden_direction = follow_laser - 2;
+  int forbidden_direction = following_laser - 2;
   cap_laser(&forbidden_direction);
   if (search_left == false)
   {
-    for (int i = start_laser_corrected; i < (start_laser_corrected+4); i++)
+    for (int i = start_laser_corrected; i < (start_laser+4); i++)
     {
 
       local_laser_idx = i;
@@ -126,16 +222,16 @@ void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
 
       if (local_laser_idx != forbidden_direction)
       {
-        if (abs(start_laser-i) > max_turns)
-        {
-          reset_wall_follower();
-        }
+        // if (abs(start_laser-i) > max_turns)
+        // {
+        //   reset_wall_follower();
+        // }
 
         if (s.at(ID)->laser_ranges[local_laser_idx] > laser_warning)
         {
-          if (local_laser_idx > max_reached_laser)
+          if (i > max_reached_laser)
           {
-            max_reached_laser = local_laser_idx;
+            max_reached_laser = i;
           }
           break;
         }
@@ -144,32 +240,37 @@ void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
   }
   else
   {
-    for (int i = start_laser_corrected; i > (start_laser_corrected-4); i--)
+    for (int i = start_laser_corrected; i > (start_laser-4); i--)
     {
       local_laser_idx = i;
       cap_laser(&local_laser_idx);
       
       if (local_laser_idx != forbidden_direction)
       {
-        if (abs(start_laser-i) > max_turns)
-        {
-          reset_wall_follower();
-        }
+        // if (abs(start_laser-i) > max_turns)
+        // {
+        //   reset_wall_follower();
+        // }
 
         if (s.at(ID)->laser_ranges[local_laser_idx] > laser_warning)
         {
-          if (local_laser_idx < max_reached_laser)
+          if (i < max_reached_laser)
           {
-            max_reached_laser = local_laser_idx;
+            max_reached_laser = i;
           }
           break;
         }
       }
     }
   }
-  follow_laser = local_laser_idx;
-  *(v_x) = cosf(follow_laser*M_PI_2)*desired_velocity;
-  *(v_y) = sinf(follow_laser*M_PI_2)*desired_velocity;
+  if(s.at(ID)->laser_ranges[local_laser_idx] < laser_warning)
+  {
+    reset_wall_follower();
+  }
+
+  following_laser = local_laser_idx;
+  *(v_x) = cosf(following_laser*M_PI_2)*desired_velocity;
+  *(v_y) = sinf(following_laser*M_PI_2)*desired_velocity;
 
 
 }
@@ -194,7 +295,7 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
   *(v_y) = 0;
 
   // attraction to waypoint
-  float local_psi = get_heading_to_point(agent_pos,goal) ;
+  float local_psi = get_heading_to_point(agent_pos,goal) - s.at(ID)->get_orientation() ;
   positive_angle(&local_psi);
   *(v_x) = cosf(local_psi)*desired_velocity;
   *(v_y) = sinf(local_psi)*desired_velocity;
@@ -247,26 +348,32 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
 void bug_repulsion::update_status(const uint16_t ID)
 {
   closest_agents = o.request_closest(ID);
-  
+  // terminalinfo::debug_msg(std::to_string(free_to_goal(ID)));
+
   if (closest_agents.size() > 0 && get_agent_dist(closest_agents[0],ID) < swarm_warning)
   {
     status = 2;
   }
-  else if (previous_status == 2)
+  else if(previous_status == 2)
   {
-    generate_new_wp(ID);
     status = 0;
+    get_new_line();
+    update_direction(ID);
   }
-  else if (previous_status == 0 && (s.at(ID)->laser_ranges[lower_idx] < laser_warning || s.at(ID)->laser_ranges[upper_idx] < laser_warning))
+  else if (avoided_obstacle(ID) && previous_status == 1)
+  {
+    status = 0;
+    get_new_line();
+    update_direction(ID);
+  }
+  else if (!free_to_goal(ID) && previous_status == 0)
   {
     status = 1;
-    start_wall_avoid = agent_pos;
     wall_follow_init(ID);
+    start_wall_avoid = agent_pos;
+    point_on_line(&start_wall_avoid,line_to_goal);
   }
-  // else if (previous_status == 1 && avoided_obstacle(ID))
-  // {
-  //   status = 0;
-  // }
+
 
   previous_status = status;
 
@@ -284,23 +391,7 @@ float bug_repulsion::get_agent_dist(const uint16_t ID1, const uint16_t ID2)
 //   return(lasers[min_laser_idx]);
 // }
 
-bool bug_repulsion::avoided_obstacle(const uint16_t ID)
-{
-  if (get_distance_to_line(line_to_goal,agent_pos) > line_max_dist)
-  {
-    return false;
-  }
-  else if (getDistance(start_wall_avoid,agent_pos) > min_obs_avoid_thres && s.at(ID)->laser_ranges[lower_idx] > laser_warning && s.at(ID)->laser_ranges[upper_idx] > laser_warning   )  
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-  
-  
-}
+
 
 // updates individual and swarm best wps
 void bug_repulsion::get_new_line(void)
@@ -308,6 +399,7 @@ void bug_repulsion::get_new_line(void)
   line_to_goal.p0 = agent_pos;
   line_to_goal.p1 = goal;
   update_line(&line_to_goal);
+
 }
 
 void bug_repulsion::update_follow_laser(void)
@@ -324,8 +416,9 @@ void bug_repulsion::update_follow_laser(void)
 }
 
 // called when following the line within a corridor
-void bug_repulsion::follow_line(float* v_x, float* v_y)
+void bug_repulsion::follow_line(const uint16_t ID, float* v_x, float* v_y)
 {
+  // check_passed_goal(ID);
   if (get_distance_to_line(line_to_goal,agent_pos) > line_max_dist)
   {
     update_follow_laser();
@@ -333,8 +426,6 @@ void bug_repulsion::follow_line(float* v_x, float* v_y)
   following_heading = following_laser*M_PI_2;
   *(v_x) = cosf(following_heading)*desired_velocity;
   *(v_y) = sinf(following_heading)*desired_velocity;
-
-
 }
 
 void bug_repulsion::update_best_wps(const uint16_t ID)
@@ -361,17 +452,30 @@ void bug_repulsion::update_best_wps(const uint16_t ID)
 void bug_repulsion::generate_new_wp(const uint16_t ID)
 {
   iteration_start_time = simtime_seconds;
+  if (environment.best_gas > 100)
+  {
+  
   float r_p = rg.uniform_float(0,1);
   float r_g = rg.uniform_float(0,1);
   
   random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
-  float v_x = rand_p*(random_point.x-agent_pos.x)+omega*(goal.x-agent_pos.x)+phi_p*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g*r_g*(environment.best_gas_pos_x-agent_pos.x);
+  float v_x = rand_p*(random_point.x)+omega*(goal.x-agent_pos.x)+phi_p*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g*r_g*(environment.best_gas_pos_x-agent_pos.x);
   float v_y = rand_p*(random_point.y-agent_pos.y)+omega*(goal.y-agent_pos.y)+phi_p*r_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g*r_g*(environment.best_gas_pos_y-agent_pos.y);
   goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
+  }
+  else
+  {
+    random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
+    float v_x = 0.5*(random_point.x)+0.5*(goal.x-agent_pos.x);
+    float v_y = 0.5*(random_point.y)+0.5*(goal.y-agent_pos.y);
+    goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
+  }
+  
 
   s.at(ID)->goal = goal; 
   get_new_line();
   update_direction(ID);
+  status = 0;
 }
 
 void bug_repulsion::update_direction(const uint16_t ID)
@@ -394,7 +498,9 @@ void bug_repulsion::update_direction(const uint16_t ID)
   {
     following_laser = lower_idx;
   }
+  
 }
+
 
 
 

@@ -59,7 +59,8 @@ void main_loop_function()
       drawer.velocity_arrow(ID,  s[ID]->state.at(0), s[ID]->state.at(1), s[ID]->state.at(2), s[ID]->state.at(3));
       drawer.red_point(s[ID]->goal.x,s[ID]->goal.y);
       drawer.yellow_point(environment.best_gas_pos_x,environment.best_gas_pos_y);
-      
+      // drawer.segment(s.at(ID)->line.p0.x,s.at(ID)->line.p0.y,s.at(ID)->line.p1.x,s.at(ID)->line.p1.y);
+
       for (uint i = 0 ; i<s[ID]->laser_pnts.size(); i++)
       {
         drawer.laser(s[ID]->state[1],s[ID]->state[0],s[ID]->laser_pnts[i][0],s[ID]->laser_pnts[i][1]);

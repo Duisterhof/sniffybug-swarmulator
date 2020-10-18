@@ -76,6 +76,8 @@ public:
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
 	float update_time = 40.0; // every x seconds a new waypoint is generated, if the goal isn't found before then
 	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
+	float time_started_wall_avoid = 0.0;
+	float time_to_follow = 10.0;
 
 	float rand_p = 0.0;
 	float omega = 0.2;

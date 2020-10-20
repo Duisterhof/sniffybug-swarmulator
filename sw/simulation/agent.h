@@ -49,6 +49,8 @@ public:
   float best_agent_gas = -1.0; // best found gas concentration
   Line line;
   Point wall_init;
+  float distance_accumulator = 0.0;
+  int num_steps = 0;
 
 
   /**

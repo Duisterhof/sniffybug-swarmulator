@@ -1,7 +1,7 @@
 import numpy as np
 import glob
 
-def get_spawn_pos(n_agents,folder='../../../conf/environments/',min_dist=1.5):
+def get_spawn_pos(n_agents,folder='../../../conf/environments/',min_dist=0.5):
     files = [file for file in glob.glob(folder+'*/free_pnts.txt')]
 
     for file in files:

@@ -46,6 +46,10 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
       repulse_swarm(ID, &v_x, &v_y);
       break;
   }
+
+  s.at(ID)->distance_accumulator = s.at(ID)->distance_accumulator + sqrtf(powf((s.at(ID)->state[1]-environment.gas_obj.source_location[0]-environment.x_min),2)+powf((s.at(ID)->state[0]-environment.gas_obj.source_location[1]-environment.y_min),2));
+  s.at(ID)->num_steps = s.at(ID)->num_steps + 1;
+
   terminalinfo::debug_msg(std::to_string(status));
   // terminalinfo::debug_msg(std::to_string(search_left));
   // terminalinfo::debug_msg(std::to_string(v_y));
@@ -325,7 +329,7 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
     }
   }
   
-  float vector_size = sqrt(pow(*(v_x),2)+pow(*(v_y),2));
+  float vector_size = sqrtf(powf(*(v_x),2)+powf(*(v_y),2));
 
   *(v_x) = *(v_x)/vector_size*desired_velocity;
   *(v_y) = *(v_y)/vector_size*desired_velocity;
@@ -380,7 +384,7 @@ void bug_repulsion::update_status(const uint16_t ID)
 
 float bug_repulsion::get_agent_dist(const uint16_t ID1, const uint16_t ID2)
 {
-  return(sqrtf(pow(s.at(ID1)->state[0]-s.at(ID2)->state[0],2)+pow(s.at(ID1)->state[1]-s.at(ID2)->state[1],2)));
+  return(sqrtf(powf(s.at(ID1)->state[0]-s.at(ID2)->state[0],2)+powf(s.at(ID1)->state[1]-s.at(ID2)->state[1],2)));
 }
 
 // float bug_repulsion::get_laser_min(const uint16_t ID)

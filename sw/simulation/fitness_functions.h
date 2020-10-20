@@ -83,6 +83,20 @@ inline static void source_distance(float &f)
   }
   f = source_dist/nagents;
 
+}/**
+ * Source distance
+ *
+ * Gives a better fitness for smaller distance to source on AVERAGE over the entire run
+ */
+inline static void source_distance_avg(float &f)
+{
+  float source_dist = 0;
+  for(uint ID =0; ID<nagents; ID++)
+  {
+    source_dist += s.at(ID)->distance_accumulator/(float)(s.at(ID)->num_steps);
+  }
+  f = source_dist/(float)(nagents);
+
 }
 
 
@@ -134,6 +148,8 @@ inline static float evaluate_fitness()
   { connectivity_check(f);}
   else if (!strcmp(param->fitness().c_str(), "source_distance"))
   { source_distance(f);}
+  else if (!strcmp(param->fitness().c_str(), "source_distance_avg"))
+  { source_distance_avg(f);}
   return f;
 }
 

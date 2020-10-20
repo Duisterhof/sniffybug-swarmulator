@@ -63,7 +63,7 @@ public:
 	void check_passed_goal(const uint16_t ID);
 	bool avoided_obstacle(const uint16_t ID);
 	// float get_laser_min(const uint16_t ID);
-
+	std::vector<float> policy_params = load_vector("conf/policies/gas_params.txt");
 	random_generator rg;
 	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position;	// agent position point struct
 	Line line_to_goal; // line to goal waypoint
@@ -74,16 +74,25 @@ public:
 	float laser_headings[4] = {0,M_PI_2,M_PI,3*M_PI_2};	// headings in body frame of all lasers
 
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
-	float update_time = 40.0; // every x seconds a new waypoint is generated, if the goal isn't found before then
+
 	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
 	float time_started_wall_avoid = 0.0;
-	float time_to_follow = 10.0;
+	
+	// learned params
+	// float rand_p = 0.0;
+	// float omega = 0.2;
+	// float phi_p = 0.3;
+	// float phi_g = 2.0;
+	//float update_time = 40.0;
+	// float time_to_follow = 10.0;
 
-	float rand_p = 0.0;
-	float omega = 0.2;
-	float phi_p = 0.3;
-	float phi_g = 2.0;
-
+	float rand_p = policy_params[0];
+	float omega = policy_params[1];
+	float phi_p = policy_params[2];
+	float phi_g = policy_params[3];
+	float update_time = policy_params[4]; // every x seconds a new waypoint is generated, if the goal isn't found before then
+	float time_to_follow = policy_params[5];
+	
 	float old_vx = 0.0;
 	float old_vy = 0.0;
 

@@ -54,6 +54,10 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
   if (distance_to_source < close_to_source_thres)
   {
     s.at(ID)->num_close_to_source += 1;
+    if(s.at(ID)->first_in_source == 500)
+    {
+      s.at(ID)->first_in_source = simtime_seconds;
+    }
   }
 
   terminalinfo::debug_msg(std::to_string(status));

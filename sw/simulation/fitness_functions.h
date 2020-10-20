@@ -114,6 +114,21 @@ inline static void source_close(float &f)
   f = (float)(source_close);
 }
 
+/**
+ * Source first
+ *
+ * Gives a better fitness for agents that get into the source zone more often
+ */
+inline static void source_first(float &f)
+{
+  float source_time = 0;
+  for(uint ID =0; ID<nagents; ID++)
+  {
+    source_time += s.at(ID)->first_in_source;
+  }
+  f = source_time;
+}
+
 
 
 /**
@@ -167,6 +182,8 @@ inline static float evaluate_fitness()
   { source_distance_avg(f);}
   else if (!strcmp(param->fitness().c_str(), "source_close"))
   { source_close(f);}
+  else if (!strcmp(param->fitness().c_str(), "source_first"))
+  { source_first(f);}
 
   return f;
 }

@@ -47,8 +47,14 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
       break;
   }
 
-  s.at(ID)->distance_accumulator = s.at(ID)->distance_accumulator + sqrtf(powf((s.at(ID)->state[1]-environment.gas_obj.source_location[0]-environment.x_min),2)+powf((s.at(ID)->state[0]-environment.gas_obj.source_location[1]-environment.y_min),2));
+  float distance_to_source = sqrtf(powf((s.at(ID)->state[1]-environment.gas_obj.source_location[0]-environment.x_min),2)+powf((s.at(ID)->state[0]-environment.gas_obj.source_location[1]-environment.y_min),2));
+  s.at(ID)->distance_accumulator = s.at(ID)->distance_accumulator + distance_to_source ;
   s.at(ID)->num_steps = s.at(ID)->num_steps + 1;
+
+  if (distance_to_source < close_to_source_thres)
+  {
+    s.at(ID)->num_close_to_source += 1;
+  }
 
   terminalinfo::debug_msg(std::to_string(status));
   // terminalinfo::debug_msg(std::to_string(search_left));

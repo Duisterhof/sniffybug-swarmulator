@@ -29,10 +29,10 @@ print("Loading and building Swarmulator")
 sim = swarmulator.swarmulator(verbose=False)
 sim.make(controller=args.controller, agent=args.agent, clean=True, logger=False, verbose=False)
 # Swarmulator settings
-sim.runtime_setting("time_limit", str("298")) # Time limit of each simulation 
+sim.runtime_setting("time_limit", str("150")) # Time limit of each simulation 
 sim.runtime_setting("simulation_realtimefactor", str("300")) # Real time factor
-sim.runtime_setting("environment", "image_testing") # Environment, leave empty for boundless
-sim.runtime_setting("fitness", "source_distance") # Fitness function to use (in sw/simulation/fitness_functions.h)
+# sim.runtime_setting("environment", "image_testing") # Environment, leave empty for boundless
+sim.runtime_setting("fitness", "source_close") # Fitness function to use (in sw/simulation/fitness_functions.h)
 
 
 # Specify network topology
@@ -44,6 +44,9 @@ environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5'
 num_params = 6
 num_agents = 3
 
+min_bounds = [0,0,0,0,0,0]
+max_bounds = [5,5,5,5,50,50]
+
 sim.set_n_agents(num_agents)
 
 class prob_bart:
@@ -54,11 +57,10 @@ class prob_bart:
     def fitness(self,x):
         fh.save_to_txt(x, sim.path+policy_file)
         f = sim.batch_run_envs(environments) # Run with 10-20 robots, 5 times (default args.batchsize=5)
-        return [f.mean()]
+        return [-f.mean()]
 
     def get_bounds(self):
-        return([0]*num_params,[50]*num_params)
-
+        return(min_bounds,max_bounds)
 
 if __name__ == "__main__":
     

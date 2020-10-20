@@ -96,6 +96,7 @@ public:
 	float old_vx = 0.0;
 	float old_vy = 0.0;
 
+	float close_to_source_thres = 2.0;
 	// line following
 	float line_heading; // heading from agent_pos to goal
 	int lower_idx; // from a clockwise-postive, the lower idx of the laser in the heading zone

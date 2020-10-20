@@ -99,6 +99,21 @@ inline static void source_distance_avg(float &f)
 
 }
 
+/**
+ * Source pass
+ *
+ * Gives a better fitness for agents that get into the source zone more often
+ */
+inline static void source_close(float &f)
+{
+  int source_close = 0;
+  for(uint ID =0; ID<nagents; ID++)
+  {
+    source_close += s.at(ID)->num_close_to_source;
+  }
+  f = (float)(source_close);
+}
+
 
 
 /**
@@ -150,6 +165,9 @@ inline static float evaluate_fitness()
   { source_distance(f);}
   else if (!strcmp(param->fitness().c_str(), "source_distance_avg"))
   { source_distance_avg(f);}
+  else if (!strcmp(param->fitness().c_str(), "source_close"))
+  { source_close(f);}
+
   return f;
 }
 

@@ -51,6 +51,7 @@ public:
   Point wall_init;
   float distance_accumulator = 0.0;
   int num_steps = 0;
+  int num_close_to_source = 0;
 
 
   /**

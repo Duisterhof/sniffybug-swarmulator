@@ -18,10 +18,20 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
 
   s.at(ID)->line = line_to_goal;
 
+  // give each agent a new WP when a better place is found
+  if (environment.best_gas > best_known_conc)
+  {
+    best_known_conc = environment.best_gas;
+    generate_new_wp(ID);
+    status = 0;
+    previous_status = 0;
+  }
+
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
     generate_new_wp(ID);
     status = 0;
+    previous_status = 0;
   }
   else if (simtime_seconds == 0.0)
   {

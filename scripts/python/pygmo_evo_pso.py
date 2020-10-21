@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description='Evolve a controller using swarmula
 parser.add_argument('-controller', type=str, help="(str) Controller to use", default="bug_repulsion")
 parser.add_argument('-agent', type=str, help="(str) Swramulator agent to use", default="particle_oriented_xy")
 parser.add_argument('-gen', type=int, help="(int) Max number generations, default = 100", default=400)
-parser.add_argument('-batchsize', type=int, help="(int) Batch size. How many parallel tests to try, default = 10", default=10)
+parser.add_argument('-batchsize', type=int, help="(int) Batch size. How many parallel tests to try, default = 10", default=5)
 parser.add_argument('-resume', type=str, help="(str) Resume after quitting from the indicated saved file, default = None", default=None)
 parser.add_argument('-plot', type=str, help="(str) If set, it will plot the evolution from a saved run, default = None", default=None)
 parser.add_argument('-id', type=int, help="(int) Evolutionary run ID, default = 1", default=1)
@@ -32,20 +32,20 @@ sim.make(controller=args.controller, agent=args.agent, clean=True, logger=False,
 sim.runtime_setting("time_limit", str("298")) # Time limit of each simulation 
 sim.runtime_setting("simulation_realtimefactor", str("300")) # Real time factor
 # sim.runtime_setting("environment", "image_testing") # Environment, leave empty for boundless
-sim.runtime_setting("fitness", "source_first") # Fitness function to use (in sw/simulation/fitness_functions.h)
+sim.runtime_setting("fitness", "source_distance_avg") # Fitness function to use (in sw/simulation/fitness_functions.h)
 
 
 # Specify network topology
 shape_file = "../../conf/policies/gas_shape.txt"
 policy_file = "conf/policies/gas_params.txt"
 sim.runtime_setting("policy", policy_file) 
-environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5','rand_env_6','rand_env_7','rand_env_8','rand_env_9','rand_env_10']
+environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5']
 
-num_params = 4
+num_params = 5
 num_agents = 3
 
-min_bounds = [0,0,0,0,]
-max_bounds = [10,10,10,10]
+min_bounds = [0,0,0,0,0]
+max_bounds = [10,10,10,10,50]
 
 sim.set_n_agents(num_agents)
 

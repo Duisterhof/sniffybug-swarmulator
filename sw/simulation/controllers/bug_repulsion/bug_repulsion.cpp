@@ -86,9 +86,29 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
   // old_vy = v_y;
 
 }
+bool bug_repulsion::check_back_in_line(void)
+{
+  float dist = get_distance_to_line(line_to_goal,agent_pos);
+  if (dist > line_max_dist && left_line_zone == false)
+  {
+    left_line_zone = true;
+  }
+
+  if (left_line_zone == true && dist < line_max_dist)
+  {
+    left_line_zone = false;
+    return true;
+  }
+  else 
+  {
+    return false;
+  }
+}
+
 
 void bug_repulsion::wall_follow_init(const uint16_t ID)
 {
+  left_line_zone = false;
   float temp_line_heading = get_heading_to_point(agent_pos,goal); // used to follow the line
   float temp_corrected_heading = temp_line_heading - s.at(ID)->get_orientation();
   positive_angle(&temp_corrected_heading);
@@ -318,17 +338,25 @@ void bug_repulsion::reset_wall_follower(void)
 
 void bug_repulsion::update_swarm_cg(const uint16_t ID)
 {
-  swarm_cg = {.x=0,.y=0};
-  for (uint i = 0 ; i < nagents; i++)
+  if (nagents > 1)
   {
-    if (i != ID)
+    swarm_cg = {.x=0,.y=0};
+    for (uint i = 0 ; i < nagents; i++)
     {
-      swarm_cg.x += (s.at(ID)->state[1]);
-      swarm_cg.y += (s.at(ID)->state[0]);
+      if (i != ID)
+      {
+        swarm_cg.x += (s.at(ID)->state[1]);
+        swarm_cg.y += (s.at(ID)->state[0]);
+      }
+    
     }
-  
+    swarm_cg = {.x=(swarm_cg.x/(nagents-1)), .y = (swarm_cg.y/(nagents-1))};
   }
-  swarm_cg = {.x=(swarm_cg.x/(nagents-1)), .y = (swarm_cg.y/(nagents-1))};
+  else
+  {
+    swarm_cg = agent_pos;
+  }
+  
 }
 
 void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
@@ -402,7 +430,7 @@ void bug_repulsion::update_status(const uint16_t ID)
     get_new_line();
     update_direction(ID);
   }
-  else if ((simtime_seconds-time_started_wall_avoid)>time_to_follow && previous_status == 1)
+  else if (check_back_in_line() && previous_status == 1)
   {
     status = 0;
     get_new_line();

@@ -63,6 +63,7 @@ public:
 	void check_passed_goal(const uint16_t ID);
 	bool avoided_obstacle(const uint16_t ID);
 	void update_swarm_cg(const uint16_t ID);
+	bool check_back_in_line(void);
 	// float get_laser_min(const uint16_t ID);
 	std::vector<float> policy_params = load_vector("conf/policies/gas_params.txt");
 	random_generator rg;
@@ -124,6 +125,9 @@ public:
 	float min_obs_avoid_thres = 2.0; // minimum distance to have moved when avoiding obstacle
 
 	bool search_left = false; // searching direction when wall-following
+
+	bool left_line_zone = false;
+	
 	int start_laser = 0; // laser at which we start 'looking', see paper
 	int start_laser_corrected = 0; // to avoid oscillations
 	int follow_laser = 0; // the actual laser direction in which we are moving

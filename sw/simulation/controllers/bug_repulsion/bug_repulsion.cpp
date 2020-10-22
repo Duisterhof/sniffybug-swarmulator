@@ -27,6 +27,11 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
     previous_status = 0;
   }
 
+  if (environment.best_gas > 100)
+  {
+    update_time = update_time_after;
+  }
+
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
     generate_new_wp(ID);
@@ -503,8 +508,8 @@ void bug_repulsion::generate_new_wp(const uint16_t ID)
   else
   {
     random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
-    float v_x = rand_p_pre*(random_point.x-agent_pos.x)+omega_pre*(goal.x-agent_pos.x)+phi_p_pre*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g_pre*r_g*(environment.best_gas_pos_x-agent_pos.x) + swarm_cg_pre*(swarm_cg.x-agent_pos.x);
-    float v_y = rand_p_pre*(random_point.y-agent_pos.y)+omega_pre*(goal.y-agent_pos.y)+phi_p_pre*r_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g_pre*r_g*(environment.best_gas_pos_y-agent_pos.y)+ swarm_cg_pre*(swarm_cg.y-agent_pos.x);
+    float v_x = rand_p_pre*(random_point.x-agent_pos.x)+omega_pre*(goal.x-agent_pos.x)+ swarm_cg_pre*(swarm_cg.x-agent_pos.x);
+    float v_y = rand_p_pre*(random_point.y-agent_pos.y)+omega_pre*(goal.y-agent_pos.y)+ swarm_cg_pre*(swarm_cg.y-agent_pos.x);
     goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
   }
   

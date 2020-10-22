@@ -42,7 +42,7 @@ vector<float> particle_oriented_xy::state_update(vector<float> state)
   orientation = wrapToPi_f(state[6]);
 
   // Acceleration control
-  float ka = 2;
+  float ka = 1;
   state.at(4) = ka * (vx_global - state[2]); // Acceleration global frame
   state.at(5) = ka * (vy_global - state[3]); // Acceleration global frame
   moving = controller->moving;

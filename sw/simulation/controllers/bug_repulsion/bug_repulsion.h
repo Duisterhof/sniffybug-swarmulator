@@ -62,10 +62,11 @@ public:
 	bool free_to_goal(const uint16_t ID);
 	void check_passed_goal(const uint16_t ID);
 	bool avoided_obstacle(const uint16_t ID);
+	void update_swarm_cg(const uint16_t ID);
 	// float get_laser_min(const uint16_t ID);
 	std::vector<float> policy_params = load_vector("conf/policies/gas_params.txt");
 	random_generator rg;
-	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position;	// agent position point struct
+	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position, swarm_cg;	// agent position point struct
 	Line line_to_goal; // line to goal waypoint
 	OmniscientObserver o; // used to get relative position of other agents
 
@@ -91,7 +92,13 @@ public:
 	float omega = policy_params[1];
 	float phi_p = policy_params[2];
 	float phi_g = policy_params[3];
-	float update_time = policy_params[4]; // every x seconds a new waypoint is generated, if the goal isn't found before then
+
+	float omega_pre = policy_params[4];
+	float phi_p_pre = policy_params[5];
+	float phi_g_pre = policy_params[6];
+	float swarm_cg_pre = policy_params[7];
+	float rand_p_pre = policy_params[8];
+	float update_time = policy_params[9]; // every x seconds a new waypoint is generated, if the goal isn't found before then
 	// float time_to_follow = policy_params[5];
 	float old_vx = 0.0;
 	float old_vy = 0.0;

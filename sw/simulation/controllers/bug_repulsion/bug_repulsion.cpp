@@ -311,6 +311,21 @@ void bug_repulsion::reset_wall_follower(void)
   
 }
 
+void bug_repulsion::update_swarm_cg(const uint16_t ID)
+{
+  swarm_cg = {.x=0,.y=0};
+  for (uint i = 0 ; i < nagents; i++)
+  {
+    if (i != ID)
+    {
+      swarm_cg.x += (s.at(ID)->state[1]);
+      swarm_cg.y += (s.at(ID)->state[0]);
+    }
+  
+  }
+  swarm_cg = {.x=(swarm_cg.x/(nagents-1)), .y = (swarm_cg.y/(nagents-1))};
+}
+
 void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
 {
   *(v_x) = 0;
@@ -474,13 +489,12 @@ void bug_repulsion::update_best_wps(const uint16_t ID)
 
 void bug_repulsion::generate_new_wp(const uint16_t ID)
 {
+  update_swarm_cg(ID);
   iteration_start_time = simtime_seconds;
-  if (environment.best_gas > 100)
-  {
-  
   float r_p = rg.uniform_float(0,1);
   float r_g = rg.uniform_float(0,1);
-  
+  if (environment.best_gas > 100)
+  { 
   random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
   float v_x = rand_p*(random_point.x)+omega*(goal.x-agent_pos.x)+phi_p*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g*r_g*(environment.best_gas_pos_x-agent_pos.x);
   float v_y = rand_p*(random_point.y-agent_pos.y)+omega*(goal.y-agent_pos.y)+phi_p*r_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g*r_g*(environment.best_gas_pos_y-agent_pos.y);
@@ -489,8 +503,8 @@ void bug_repulsion::generate_new_wp(const uint16_t ID)
   else
   {
     random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
-    float v_x = 0.5*(random_point.x)+0.5*(goal.x-agent_pos.x);
-    float v_y = 0.5*(random_point.y)+0.5*(goal.y-agent_pos.y);
+    float v_x = rand_p_pre*(random_point.x-agent_pos.x)+omega_pre*(goal.x-agent_pos.x)+phi_p_pre*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g_pre*r_g*(environment.best_gas_pos_x-agent_pos.x) + swarm_cg_pre*(swarm_cg.x-agent_pos.x);
+    float v_y = rand_p_pre*(random_point.y-agent_pos.y)+omega_pre*(goal.y-agent_pos.y)+phi_p_pre*r_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g_pre*r_g*(environment.best_gas_pos_y-agent_pos.y)+ swarm_cg_pre*(swarm_cg.y-agent_pos.x);
     goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
   }
   

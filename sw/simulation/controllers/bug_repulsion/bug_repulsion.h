@@ -77,7 +77,7 @@ public:
 
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
 
-	float dist_reached_goal = 0.5; // distance threshold for classifying as finding the goal
+	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
 	float time_started_wall_avoid = 0.0;
 	
 	// learned params

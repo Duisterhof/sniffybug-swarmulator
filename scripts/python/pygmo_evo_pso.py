@@ -39,13 +39,13 @@ sim.runtime_setting("fitness", "source_distance_avg") # Fitness function to use 
 shape_file = "../../conf/policies/gas_shape.txt"
 policy_file = "conf/policies/gas_params.txt"
 sim.runtime_setting("policy", policy_file) 
-environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5']
+environments = ['rand_env_1','rand_env_2','rand_env_4','rand_env_5','rand_env_6','rand_env_7','rand_env_8','rand_env_9','rand_env_10']
 
 num_params = 8
 num_agents = 3
 
-min_bounds = [-10,-10,-10,-10,-10,-10,0,0]
-max_bounds = [10,10,10,10,10,10,50,50]
+min_bounds = [0,-5,-5,-5,-5,0,0,0]
+max_bounds = [5,5,5,5,5,5,80,80]
 
 sim.set_n_agents(num_agents)
 
@@ -56,7 +56,7 @@ class prob_bart:
     
     def fitness(self,x):
         fh.save_to_txt(x, sim.path+policy_file)
-        f = sim.batch_run_envs(environments) # Run with 10-20 robots, 5 times (default args.batchsize=5)
+        f = sim.batch_run_envs(environments[:args.batchsize]) # Run with 10-20 robots, 5 times (default args.batchsize=5)
         return [f.mean()]
 
     def get_bounds(self):
@@ -72,7 +72,9 @@ if __name__ == "__main__":
 
 
     for i in range(400):
-        get_spawn_pos(num_agents,'../../conf/environments/',0.5)
+        get_spawn_pos(num_agents,'../../conf/environments/',0.5) # giving all agents a new spawning position
+        np.random.shuffle(environments)
+
         print("Generation %i"%i)
         pop = algo.evolve(pop)
         print(pop.champion_f)

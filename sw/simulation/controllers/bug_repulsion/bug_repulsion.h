@@ -77,7 +77,7 @@ public:
 
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
 
-	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
+	float dist_reached_goal = 0.5; // distance threshold for classifying as finding the goal
 	float time_started_wall_avoid = 0.0;
 	
 	// learned params
@@ -95,10 +95,9 @@ public:
 	float phi_g = policy_params[3];
 
 	float omega_pre = policy_params[4];
-	float swarm_cg_pre = policy_params[5];
-	float rand_p_pre = policy_params[6];
-	float update_time_after = policy_params[7]; // every x seconds a new waypoint is generated, if the goal isn't found before then
-	float update_time_pre = policy_params[8];
+	float rand_p_pre = policy_params[5];
+	float update_time_after = policy_params[6]; // every x seconds a new waypoint is generated, if the goal isn't found before then
+	float update_time_pre = policy_params[7];
 	float update_time = update_time_pre;
 	// float time_to_follow = policy_params[5];
 	float old_vx = 0.0;

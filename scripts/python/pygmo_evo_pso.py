@@ -41,11 +41,11 @@ policy_file = "conf/policies/gas_params.txt"
 sim.runtime_setting("policy", policy_file) 
 environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5']
 
-num_params = 9
+num_params = 8
 num_agents = 3
 
-min_bounds = [-10,-10,-10,-10,-10,-10,-10,0,0]
-max_bounds = [10,10,10,10,10,10,10,50,50]
+min_bounds = [-10,-10,-10,-10,-10,-10,0,0]
+max_bounds = [10,10,10,10,10,10,50,50]
 
 sim.set_n_agents(num_agents)
 

@@ -27,7 +27,7 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
     previous_status = 0;
   }
 
-  if (environment.best_gas > 100)
+  if (environment.best_gas > 0)
   {
     update_time = update_time_after;
   }
@@ -522,7 +522,7 @@ void bug_repulsion::update_best_wps(const uint16_t ID)
 
 void bug_repulsion::generate_new_wp(const uint16_t ID)
 {
-  update_swarm_cg(ID);
+  // update_swarm_cg(ID);
   iteration_start_time = simtime_seconds;
   float r_p = rg.uniform_float(0,1);
   float r_g = rg.uniform_float(0,1);
@@ -536,8 +536,8 @@ void bug_repulsion::generate_new_wp(const uint16_t ID)
   else
   {
     random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
-    float v_x = rand_p_pre*(random_point.x-agent_pos.x)+omega_pre*(goal.x-agent_pos.x)+ swarm_cg_pre*(swarm_cg.x-agent_pos.x);
-    float v_y = rand_p_pre*(random_point.y-agent_pos.y)+omega_pre*(goal.y-agent_pos.y)+ swarm_cg_pre*(swarm_cg.y-agent_pos.x);
+    float v_x = rand_p_pre*(random_point.x-agent_pos.x)+omega_pre*(goal.x-agent_pos.x);
+    float v_y = rand_p_pre*(random_point.y-agent_pos.y)+omega_pre*(goal.y-agent_pos.y);
     goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
   }
   

@@ -89,15 +89,14 @@ public:
 	float time_to_follow = 100.0;
 	float best_known_conc = 0.0;
 
-	float rand_p = policy_params[0];
-	float omega = policy_params[1];
-	float phi_p = policy_params[2];
-	float phi_g = policy_params[3];
+	float omega = policy_params[0];
+	float phi_p = policy_params[1];
+	float phi_g = policy_params[2];
 
-	float omega_pre = policy_params[4];
-	float rand_p_pre = policy_params[5];
-	float update_time_after = policy_params[6]; // every x seconds a new waypoint is generated, if the goal isn't found before then
-	float update_time_pre = policy_params[7];
+	float omega_pre = policy_params[3];
+	float rand_p_pre = policy_params[4];
+	float update_time_after = policy_params[5]; // every x seconds a new waypoint is generated, if the goal isn't found before then
+	float update_time_pre = policy_params[6];
 	float update_time = update_time_pre;
 	// float time_to_follow = policy_params[5];
 	float old_vx = 0.0;

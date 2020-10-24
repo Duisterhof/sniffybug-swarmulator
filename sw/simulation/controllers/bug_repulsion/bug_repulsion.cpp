@@ -524,11 +524,14 @@ void bug_repulsion::generate_new_wp(const uint16_t ID)
 {
   // update_swarm_cg(ID);
   iteration_start_time = simtime_seconds;
+  float r_p = rg.uniform_float(0,1);
+  float r_g = rg.uniform_float(0,1);	  
+
+
   if (environment.best_gas > 0)
   { 
-  random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
-  float v_x = rand_p*(random_point.x-agent_pos.x)+omega*(goal.x-agent_pos.x)+phi_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g*(environment.best_gas_pos_x-agent_pos.x);
-  float v_y = rand_p*(random_point.y-agent_pos.y)+omega*(goal.y-agent_pos.y)+phi_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g*(environment.best_gas_pos_y-agent_pos.y);
+  float v_x = omega*(goal.x-agent_pos.x)+phi_p*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g*r_g*(environment.best_gas_pos_x-agent_pos.x);
+  float v_y = omega*(goal.y-agent_pos.y)+phi_p*r_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g*r_g*(environment.best_gas_pos_y-agent_pos.y);
   goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
   }
   else

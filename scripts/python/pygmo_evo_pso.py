@@ -41,11 +41,11 @@ policy_file = "conf/policies/gas_params.txt"
 sim.runtime_setting("policy", policy_file) 
 environments = ['rand_env_1','rand_env_2','rand_env_4','rand_env_5','rand_env_6','rand_env_7','rand_env_8','rand_env_9','rand_env_10']
 
-num_params = 7
+num_params = 13
 num_agents = 3
 
-min_bounds = [-5,-5,-5,-5,0,0,0]
-max_bounds = [5,5,5,5,5,80,80]
+min_bounds = [-5,-5,-5,-5,0,0,0,0,0,0,0,0,0]
+max_bounds = [5,5,5,5,5,100,100,5,5,5,1,20,20]
 
 sim.set_n_agents(num_agents)
 
@@ -63,13 +63,12 @@ class prob_bart:
         return(min_bounds,max_bounds)
 
 if __name__ == "__main__":
-    
-    
-    algo = algorithm(sga(gen=1))
+       
+    algo = algorithm(sga(gen=1, m=0.2, cr=0.5,mutation="gaussian"))
+
     algo.set_verbosity(1)
     prob = problem(prob_bart())
     pop = population(prob,50)
-
 
     for i in range(400):
         get_spawn_pos(num_agents,'../../conf/environments/',0.5) # giving all agents a new spawning position
@@ -81,8 +80,6 @@ if __name__ == "__main__":
         fh.save_to_txt(pop.champion_x,'best_individual.txt')
 
     print(pop)
-
-
 
     uda = algo.extract(sga)
     log = uda.get_log()

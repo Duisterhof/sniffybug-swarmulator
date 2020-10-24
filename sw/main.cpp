@@ -35,8 +35,8 @@ std::unique_ptr<parameters_t> param(parameters("conf/parameters.xml", xml_schema
  */
 uint nagents; // Number of agents in the simulation
 std::vector<Agent *> s; // Set up the agents
-std::shared_timed_mutex mtx; // Mutex needed to lock threads
-std::shared_timed_mutex mtx_env; // Mutex needed to lock threads
+std::shared_mutex mtx; // Mutex needed to lock threads
+std::shared_mutex mtx_env; // Mutex needed to lock threads
 float realtimefactor; // Real time factor of simulation
 float simtime_seconds = 0; // Initial simulation time
 float rangesensor = 0.3; // How far each robot can sense

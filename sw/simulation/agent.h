@@ -39,8 +39,8 @@ public:
   float manualpsi_delta;
   float gas_read = 0; //either gas concentration or distance to source
   float gas_read_lp = 1.0;
-  float laser_collision_threshold = 0.01; //if one of the laser rangers detects < 0.1 [m], we count it as a collision
-  float swarm_collision_threshold = 0.3; // if two agents get within x[m], it's a crash for both agents
+  float laser_collision_threshold = 0.5; //if one of the laser rangers detects < 0.1 [m], we count it as a collision
+  float swarm_collision_threshold = 0.5; // if two agents get within x[m], it's a crash for both agents
   std::vector<std::vector<float>> laser_pnts, intersect_walls;
   random_generator rg;
   Controller *controller = new CONTROLLER;

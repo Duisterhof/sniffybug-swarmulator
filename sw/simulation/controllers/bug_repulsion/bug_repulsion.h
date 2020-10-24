@@ -77,7 +77,7 @@ public:
 
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time
 
-	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
+
 	float time_started_wall_avoid = 0.0;
 	
 	// learned params
@@ -86,6 +86,13 @@ public:
 	// float phi_p = 0.3;
 	// float phi_g = 2.0;
 	//float update_time = 40.0;
+	//	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
+
+	// float laser_warning = 1.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
+	// float swarm_warning = 0.8; // x [m] before a distance to another agent is classified as dangerous
+	// float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
+	// float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
+	// float k_swarm_avoidance = 15.0; // used for repulsion between agents
 	float time_to_follow = 100.0;
 	float best_known_conc = 0.0;
 
@@ -97,6 +104,15 @@ public:
 	float rand_p_pre = policy_params[4];
 	float update_time_after = policy_params[5]; // every x seconds a new waypoint is generated, if the goal isn't found before then
 	float update_time_pre = policy_params[6];
+
+	float dist_reached_goal = policy_params[7];
+	float laser_warning = policy_params[8];
+	float swarm_warning = policy_params[9];
+	float line_max_dist = policy_params[10]; // max x [m] from line until we move again to move back to it
+	float k_swarm_laser_rep = policy_params[11]; // used for repulsion from lasers
+	float k_swarm_avoidance = policy_params[12]; // used for repulsion between agents
+
+
 	float update_time = update_time_pre;
 	// float time_to_follow = policy_params[5];
 	float old_vx = 0.0;
@@ -112,11 +128,9 @@ public:
 	int following_laser; // laser that we're following in body frame heading defined in 'laser_headings'
 	float following_heading; // corresponding heading, in body frame
 
-	float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
+	
 	float desired_velocity = 0.5; // [m/s]
 
-	float laser_warning = 1.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
-	float swarm_warning = 0.8; // x [m] before a distance to another agent is classified as dangerous
 	std::vector<uint> closest_agents; // list of other agent IDs, first is closest other agent
 	int status = 0; // status of avoidance, 0 = corridor following to wp, 1 = wall-following, 2 = repulsion (swarm)
 	int previous_status = 0; // used to initialize when changing status
@@ -132,8 +146,7 @@ public:
 	int max_reached_laser = 0; // max reached laser it had to go to during safe wall-following
 	
 	float max_turns = 2; // max number of turns that can be made to avoid an object
-	float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
-	float k_swarm_avoidance = 15.0; // used for repulsion between agents
+
 
 };
 

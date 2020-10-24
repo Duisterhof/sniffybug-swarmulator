@@ -11,6 +11,8 @@ matplotlib.rc('text', usetex=True)
 
 from classes.randomize_environment import get_spawn_pos
 
+
+
 class evolution:
 	'''Wrapper around the DEAP package to run an evolutionary process with just a few commands'''
 
@@ -18,6 +20,8 @@ class evolution:
 		'''Itilize the DEAP wrapper'''
 		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 		creator.create("Individual", list, fitness=creator.FitnessMin)
+
+
 
 	def setup(self, fitness_function_handle, constraint=None, GENOME_LENGTH = 20, POPULATION_SIZE = 100, P_CROSSOVER = 0.5, P_MUTATION = 0.2, NUM_AGENTS=2):
 		'''Set up the parameters'''
@@ -31,8 +35,13 @@ class evolution:
 
 		# Set the lower level parameters
 		self.toolbox = base.Toolbox()
+
 		self.toolbox.register("attr_float", random.random)
-		self.toolbox.register("individual", tools.initRepeat, creator.Individual, self.toolbox.attr_float, self.GENOME_LENGTH)
+
+
+		# self.toolbox.register("individual", tools.initRepeat, creator.Individual, (self.toolbox.attr_float_1,self.toolbox.attr_float_2,self.toolbox.attr_float_3,self.toolbox.attr_float_4,self.toolbox.attr_float_5,self.toolbox.attr_float_6,self.toolbox.attr_float_7,self.toolbox.attr_float_8,self.toolbox.attr_float_9,self.toolbox.attr_float_10, self.toolbox.attr_float_11,self.toolbox.attr_float_12,self.toolbox.attr_float_13),n=1)
+		self.toolbox.register("individual", tools.initRepeat, creator.Individual,self.toolbox.attr_float,n=GENOME_LENGTH)
+		# self.toolbox.register("individual", tools.initCycle, creator.Individual, functions, n=1)
 		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 		self.toolbox.register("evaluate", fitness_function_handle)
 		self.toolbox.register("mate", tools.cxTwoPoint) # Mating method

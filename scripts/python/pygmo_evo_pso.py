@@ -64,7 +64,7 @@ class prob_bart:
 
 if __name__ == "__main__":
        
-    algo = algorithm(sga(gen=1, m=0.05, mutation="gaussian"))
+    algo = algorithm(sga(gen=1, m=0.05))
 
     algo.set_verbosity(1)
     prob = problem(prob_bart())

@@ -64,6 +64,7 @@ public:
 	bool avoided_obstacle(const uint16_t ID);
 	void update_swarm_cg(const uint16_t ID);
 	bool check_back_in_line(void);
+	float get_laser_min(const uint16_t ID);
 	// float get_laser_min(const uint16_t ID);
 	std::vector<float> policy_params = load_vector("conf/policies/gas_params.txt");
 	random_generator rg;
@@ -86,13 +87,14 @@ public:
 	// float phi_p = 0.3;
 	// float phi_g = 2.0;
 	//float update_time = 40.0;
-	//	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
+	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
 
-	// float laser_warning = 1.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
-	// float swarm_warning = 0.8; // x [m] before a distance to another agent is classified as dangerous
-	// float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
-	// float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
-	// float k_swarm_avoidance = 15.0; // used for repulsion between agents
+	float laser_warning = 2.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
+	float laser_critical = 1000.0; // x [m]
+	float swarm_warning = 0.8; // x [m] before a distance to another agent is classified as dangerous
+	float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
+	float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
+	float k_swarm_avoidance = 15.0; // used for repulsion between agents
 	float time_to_follow = 100.0;
 	float best_known_conc = 0.0;
 

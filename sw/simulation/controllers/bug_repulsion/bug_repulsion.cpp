@@ -415,6 +415,8 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
 }
 
 
+
+
 void bug_repulsion::update_status(const uint16_t ID)
 {
   closest_agents = o.request_closest(ID);
@@ -455,12 +457,12 @@ float bug_repulsion::get_agent_dist(const uint16_t ID1, const uint16_t ID2)
   return(sqrtf(powf(s.at(ID1)->state[0]-s.at(ID2)->state[0],2)+powf(s.at(ID1)->state[1]-s.at(ID2)->state[1],2)));
 }
 
-// float bug_repulsion::get_laser_min(const uint16_t ID)
-// {
-//   std::vector<float> lasers =  s.at(ID)->laser_ranges;
-//   int min_laser_idx = std::distance(lasers.begin(),std::min_element(lasers.begin(),lasers.end())); // min laser idx
-//   return(lasers[min_laser_idx]);
-// }
+float bug_repulsion::get_laser_min(const uint16_t ID)
+{
+  std::vector<float> lasers =  s.at(ID)->laser_ranges;
+  int min_laser_idx = std::distance(lasers.begin(),std::min_element(lasers.begin(),lasers.end())); // min laser idx
+  return(lasers[min_laser_idx]);
+}
 
 
 

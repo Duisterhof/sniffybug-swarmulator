@@ -56,7 +56,7 @@ class prob_bart:
     
     def fitness(self,x):
         fh.save_to_txt(x, sim.path+policy_file)
-        f = sim.batch_run_envs(environments[:args.batchsize]) # Run with 10-20 robots, 5 times (default args.batchsize=5)
+        f = sim.batch_run_envs(environments[:args.batchsize]) # Run with 10-20 robots, 5kimes (default args.batchsize=5)
         return [f.mean()]
 
     def get_bounds(self):
@@ -64,7 +64,7 @@ class prob_bart:
 
 if __name__ == "__main__":
        
-    algo = algorithm(sga(gen=1, m=0.2, cr=0.5,mutation="gaussian"))
+    algo = algorithm(sga(gen=1, m=0.05, mutation="gaussian"))
 
     algo.set_verbosity(1)
     prob = problem(prob_bart())

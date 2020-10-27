@@ -39,7 +39,7 @@ sim.runtime_setting("fitness", "source_distance_avg") # Fitness function to use 
 shape_file = "../../conf/policies/gas_shape.txt"
 policy_file = "conf/policies/gas_params.txt"
 sim.runtime_setting("policy", policy_file) 
-environments = ['rand_env_1','rand_env_2','rand_env_4','rand_env_5','rand_env_6','rand_env_7','rand_env_8','rand_env_9','rand_env_10']
+environments = ['ts_1','ts_2','ts_3','ts_4','ts_5','ts_6','ts_7','ts_8','ts_9','ts_10']
 
 num_params = 13
 num_agents = 3

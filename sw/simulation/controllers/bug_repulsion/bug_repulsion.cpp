@@ -318,8 +318,6 @@ void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
   following_laser = local_laser_idx;
   *(v_x) = cosf(following_laser*M_PI_2)*desired_velocity;
   *(v_y) = sinf(following_laser*M_PI_2)*desired_velocity;
-
-
 }
 
 void bug_repulsion::reset_wall_follower(void)
@@ -401,21 +399,8 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
 
   *(v_x) = *(v_x)/vector_size*desired_velocity;
   *(v_y) = *(v_y)/vector_size*desired_velocity;
-  // if (abs(*(v_x)) > abs(*(v_y)))
-  // {
-  //   *(v_x) = desired_velocity;
-  //   *(v_y) = 0.0;
-  // }
-  // else
-  // {
-  //   *(v_y) = desired_velocity;
-  //   *(v_x) = 0.0;
-  // }
   
 }
-
-
-
 
 void bug_repulsion::update_status(const uint16_t ID)
 {

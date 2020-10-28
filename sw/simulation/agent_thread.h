@@ -67,6 +67,7 @@ void run_agent_simulation_step(const int &ID)
         s.at(ID)->state = s_n;
         mtx.unlock();
       } else { // Wall! --> Kill the dynamics
+        s.at(ID)->is_crashed = true; // can be used for fitness function
         mtx.lock(); //sync
         s.at(ID)->state[2] = 0.0; // v_x
         s.at(ID)->state[3] = 0.0; // v_y

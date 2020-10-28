@@ -87,16 +87,17 @@ public:
 	// float phi_p = 0.3;
 	// float phi_g = 2.0;
 	//float update_time = 40.0;
-	float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
+	// float dist_reached_goal = 1.0; // distance threshold for classifying as finding the goal
 
-	float laser_warning = 2.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
-	float laser_critical = 1000.0; // x [m]
-	float swarm_warning = 1.3; // x [m] before a distance to another agent is classified as dangerous
-	float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
-	float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
-	float k_swarm_avoidance = 15.0; // used for repulsion between agents
+	// float laser_warning = 2.5; // x [m] before a laser range value is seen as dangerous --> avoid stuff
+	// float laser_critical = 1000.0; // x [m]
+	// float swarm_warning = 1.3; // x [m] before a distance to another agent is classified as dangerous
+	// float line_max_dist = 0.5; // max x [m] from line until we move again to move back to it
+	// float k_swarm_laser_rep = 5.0; // used for repulsion from lasers
+	// float k_swarm_avoidance = 15.0; // used for repulsion between agents
 	// float time_to_follow = 100.0;
 	float best_known_conc = 0.0;
+	float init_dist_to_goal = 0.0;
 
 	float omega = policy_params[0];
 	float phi_p = policy_params[1];
@@ -104,18 +105,15 @@ public:
 
 	float omega_pre = policy_params[3];
 	float rand_p_pre = policy_params[4];
-	float update_time_after = policy_params[5]; // every x seconds a new waypoint is generated, if the goal isn't found before then
-	float update_time_pre = policy_params[6];
-
-	// float dist_reached_goal = policy_params[7];
-	// float laser_warning = policy_params[8];
-	// float swarm_warning = policy_params[9];
-	// float line_max_dist = policy_params[10]; // max x [m] from line until we move again to move back to it
-	// float k_swarm_laser_rep = policy_params[11]; // used for repulsion from lasers
-	// float k_swarm_avoidance = policy_params[12]; // used for repulsion between agents
+	float update_time = policy_params[5]; // every x seconds a new waypoint is generated, if the goal isn't found before then
+	float dist_reached_goal = policy_params[6];
+	float laser_warning = policy_params[7];
+	float swarm_warning = policy_params[8];
+	float line_max_dist = policy_params[9]; // max x [m] from line until we move again to move back to it
+	float k_swarm_laser_rep = policy_params[10]; // used for repulsion from lasers
+	float k_swarm_avoidance = policy_params[11]; // used for repulsion between agents
 
 
-	float update_time = update_time_pre;
 	// float time_to_follow = policy_params[5];
 	float old_vx = 0.0;
 	float old_vy = 0.0;

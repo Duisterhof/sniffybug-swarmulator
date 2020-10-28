@@ -27,11 +27,6 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
     previous_status = 0;
   }
 
-  if (environment.best_gas > 0)
-  {
-    update_time = update_time_after;
-  }
-
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
     generate_new_wp(ID);
@@ -89,12 +84,13 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
 bool bug_repulsion::check_back_in_line(void)
 {
   float dist = get_distance_to_line(line_to_goal,agent_pos);
+  float dist_goal = getDistance(agent_pos,goal);
   if (dist > line_max_dist && left_line_zone == false)
   {
     left_line_zone = true;
   }
 
-  if (left_line_zone == true && dist < line_max_dist)
+  if (left_line_zone == true && dist < line_max_dist && (init_dist_to_goal-dist_goal) > 0)
   {
     left_line_zone = false;
     return true;
@@ -108,6 +104,7 @@ bool bug_repulsion::check_back_in_line(void)
 
 void bug_repulsion::wall_follow_init(const uint16_t ID)
 {
+  init_dist_to_goal = getDistance(agent_pos,goal);
   left_line_zone = false;
   float temp_line_heading = get_heading_to_point(agent_pos,goal); // used to follow the line
   float temp_corrected_heading = temp_line_heading - s.at(ID)->get_orientation();

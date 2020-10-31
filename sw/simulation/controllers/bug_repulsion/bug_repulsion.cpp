@@ -369,12 +369,12 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
   // add repulsion from lasers      
   for ( int i = 0; i<4; i++)
   {
-    if ( s.at(ID)->laser_ranges[i] < laser_warning)
+    if ( s.at(ID)->laser_ranges[i] < swarm_laser_warning)
     {
       float laser_heading = laser_headings[i];
       float heading_away_from_laser = laser_heading - M_PI;
-      *(v_x) += cosf(heading_away_from_laser)*k_swarm_laser_rep*(laser_warning-s.at(ID)->laser_ranges[i]);
-      *(v_y) += sinf(heading_away_from_laser)*k_swarm_laser_rep*(laser_warning-s.at(ID)->laser_ranges[i]);
+      *(v_x) += cosf(heading_away_from_laser)*k_swarm_laser_rep*(swarm_laser_warning-s.at(ID)->laser_ranges[i]);
+      *(v_y) += sinf(heading_away_from_laser)*k_swarm_laser_rep*(swarm_laser_warning-s.at(ID)->laser_ranges[i]);
     }
   }
 

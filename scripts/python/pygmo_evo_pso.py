@@ -29,7 +29,7 @@ print("Loading and building Swarmulator")
 sim = swarmulator.swarmulator(verbose=False)
 sim.make(controller=args.controller, agent=args.agent, clean=True, logger=False, verbose=False)
 # Swarmulator settings
-sim.runtime_setting("time_limit", str("100")) # Time limit of each simulation 
+sim.runtime_setting("time_limit", str("98")) # Time limit of each simulation 
 sim.runtime_setting("simulation_realtimefactor", str("300")) # Real time factor
 # sim.runtime_setting("environment", "image_testing") # Environment, leave empty for boundless
 sim.runtime_setting("fitness", "source_distance_avg") # Fitness function to use (in sw/simulation/fitness_functions.h)
@@ -39,13 +39,20 @@ sim.runtime_setting("fitness", "source_distance_avg") # Fitness function to use 
 shape_file = "../../conf/policies/gas_shape.txt"
 policy_file = "conf/policies/gas_params.txt"
 sim.runtime_setting("policy", policy_file) 
-environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5','rand_env_6','rand_env_7','rand_env_8','rand_env_9','rand_env_10']
+environments = []
 
-num_params = 12
+for i in range(100):
+    string = 'rand_env_'+str(i)
+    environments.append(string)
+
+
+# environments = ['rand_env_1','rand_env_2','rand_env_3','rand_env_4','rand_env_5','rand_env_6','rand_env_7','rand_env_8','rand_env_9','rand_env_10']
+
+num_params = 13
 num_agents = 3
 
-min_bounds = [-5,-5,-5,-5,0,0,0,0,0,0,0,0]
-max_bounds = [5,5,5,5,5,50,5,5,5,1,20,20]
+min_bounds = [-5,-5,-5,-5,0,0,0,0,0,0,0,0,0]
+max_bounds = [5,5,5,5,5,50,5,5,5,1,20,20,5]
 
 sim.set_n_agents(num_agents)
 

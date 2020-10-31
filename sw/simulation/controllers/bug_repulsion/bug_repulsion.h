@@ -112,6 +112,7 @@ public:
 	float line_max_dist = policy_params[9]; // max x [m] from line until we move again to move back to it
 	float k_swarm_laser_rep = policy_params[10]; // used for repulsion from lasers
 	float k_swarm_avoidance = policy_params[11]; // used for repulsion between agents
+	float swarm_laser_warning = policy_params[12];
 
 
 	// float time_to_follow = policy_params[5];

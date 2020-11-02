@@ -70,7 +70,7 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
     }
   }
 
-  terminalinfo::debug_msg(std::to_string(status));
+  // terminalinfo::debug_msg(std::to_string(status));
   // terminalinfo::debug_msg(std::to_string(search_left));
   // terminalinfo::debug_msg(std::to_string(v_y));
   

@@ -29,7 +29,7 @@ print("Loading and building Swarmulator")
 sim = swarmulator.swarmulator(verbose=False)
 sim.make(controller=args.controller, agent=args.agent, clean=True, logger=False, verbose=False)
 # Swarmulator settings
-sim.runtime_setting("time_limit", str("98")) # Time limit of each simulation 
+sim.runtime_setting("time_limit", str("100")) # Time limit of each simulation 
 sim.runtime_setting("simulation_realtimefactor", str("300")) # Real time factor
 # sim.runtime_setting("environment", "image_testing") # Environment, leave empty for boundless
 sim.runtime_setting("fitness", "source_distance_avg") # Fitness function to use (in sw/simulation/fitness_functions.h)
@@ -71,20 +71,25 @@ class prob_bart:
 
 if __name__ == "__main__":
        
-    algo = algorithm(sga(gen=1, m=0.05))
+    algo = algorithm(sga(gen=1, m=0.1))
 
     algo.set_verbosity(1)
     prob = problem(prob_bart())
-    pop = population(prob,50)
+    pop = population(prob,100)
 
     for i in range(400):
-        get_spawn_pos(num_agents,'../../conf/environments/',0.5) # giving all agents a new spawning position
+        get_spawn_pos(num_agents,'../../conf/environments/',0.8) # giving all agents a new spawning position
         np.random.shuffle(environments)
 
         print("Generation %i"%i)
         pop = algo.evolve(pop)
         print(pop.champion_f)
         fh.save_to_txt(pop.champion_x,'best_individual.txt')
+        
+        fitness_vector = pop.get_f()
+        fh.save_to_txt(fitness_vector,'fitness_vector_'+str(i)+'.txt')
+        fh.save_to_txt([pop.champion_f],'best_individual_'+str(i)+'.txt')
+
 
     print(pop)
 

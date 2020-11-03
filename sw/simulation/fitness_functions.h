@@ -97,6 +97,7 @@ inline static void source_distance_avg(float &f)
     if (s.at(ID)->is_crashed)
     {
       source_dist += environment.env_diagonal;
+      
     }
   }
   f = source_dist/(float)(nagents);

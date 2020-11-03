@@ -13,4 +13,4 @@ for env in envs:
     pic_dir = pic_folder+env.split('/')[-1]+".png"
     if (os.path.exists(pic_dir)):
         os.system("./swarmulator "+str(args.n_agents)+" 1 "+ env.split('/')[-1])
-
+        print(env)

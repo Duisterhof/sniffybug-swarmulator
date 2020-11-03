@@ -18,7 +18,7 @@
         <param name="number_of_outlet_models" value="0"/>
 
         #3D Location of a point in free-space
-        <param name="empty_point_x" value="5.0"/>      ### (m)        <param name="empty_point_y" value="5.0"/>      ### (m)        <param name="empty_point_z" value="2.0"/>      ### (m)            
+        <param name="empty_point_x" value="6.6"/>      ### (m)        <param name="empty_point_y" value="3.4000000000000004"/>      ### (m)        <param name="empty_point_z" value="2.0"/>      ### (m)            
 
         #Wind Data (the node will append _i.csv to the name that is specified here)
         <param name="wind_files" value="$(find envs)/$(arg scenario)/wind_simulations/"/>

@@ -70,7 +70,7 @@ class prob_bart:
         return(min_bounds,max_bounds)
 
 if __name__ == "__main__":
-       
+    get_spawn_pos(num_agents,'../../conf/environments/',0.8) # giving all agents a new spawning position   
     algo = algorithm(sga(gen=1, m=0.1))
 
     algo.set_verbosity(1)

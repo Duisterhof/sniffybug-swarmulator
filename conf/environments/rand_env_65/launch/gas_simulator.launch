@@ -34,7 +34,7 @@
         <param name="/loop_from_step" value="0" />
         <param name="/loop_to_step" value="5" />
 	    
-        <param name="source_position_x" value="5.0"/>      ### (m)        <param name="source_position_y" value="5.0"/>      ### (m)        <param name="source_position_z" value="2.0"/>      ### (m)	    <param name="source_position_z" value="0.5"/>            ### (m)
+        <param name="source_position_x" value="2.2"/>      ### (m)        <param name="source_position_y" value="6.3"/>      ### (m)        <param name="source_position_z" value="2.0"/>      ### (m)	    <param name="source_position_z" value="0.5"/>            ### (m)
 	    
 	    <param name="save_results" value="1" />                  #1=true, 0=false
 	    <param name="restuls_time_step" value="0.1" />           #(sec) Time increment between saving state to file

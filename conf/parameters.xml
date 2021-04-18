@@ -5,7 +5,7 @@
   <simulation_realtimefactor>5</simulation_realtimefactor>
   <time_limit>100</time_limit>
   <!-- (seconds). Use time_limit > 0 to set a limit. If = 0, then the simulation runs indefinitely. -->
-  <environment>image_testing</environment>
+  <environment>rand_env_12</environment>
   <!-- See the folder conf/environments/ for available environments. 
        Create your own or use "random" to generate a random map at runtime -->
   <!-- Animation -->

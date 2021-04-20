@@ -193,3 +193,6 @@ void OmniscientObserver::beacon(const uint16_t ID, float &r, float &b)
 #endif
   mtx_env.unlock_shared();
 }
+
+
+

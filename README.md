@@ -38,7 +38,7 @@ Swarmulator is designed to be modular, so that you can compile for any combinati
 
 for example, try out:
 
-    make clean && make CONTROLLER=boid AGENT=particle_oriented ANIMATION=ON
+    make clean && make -j CONTROLLER=bug_repulsion AGENT=particle_oriented_xy ANIMATION=ON VERBOSE=ON
 
 To find which agents and controllers are available in the branch, check the folders `sw/simulation/controllers` and `sw/simulation/agents`. See the next section "Prototyping with Swarmulator" for instructions on how to make your own!
 

@@ -227,6 +227,15 @@ inline static std::vector<float> load_vector(const std::string filename)
 }
 
 
+
+
+inline static int load_wind_file(const std::string filename, const bool first_file, Winddata &wind_obj)
+{
+  return 1;
+}
+
+
+
 /**
  * Read gas data points to gas object
  *
@@ -790,6 +799,21 @@ struct MyType
   }
 };
 
+struct MyWindType
+{
+  // int x;
+  // double y;
+  Winddata wind_obj;
+
+  template <class Archive>
+  void serialize( Archive & ar, std::uint32_t const version )
+  {
+    // ar( x, y );
+    // ar( s );
+    ar(wind_obj);
+  }
+};
+
 
 inline static void save_gas_object(Gasdata &gas_obj,std::string env_dir)
 {
@@ -812,6 +836,31 @@ inline static Gasdata load_gas_object(std::string env_dir)
   MyType output;
   iarchive(output);
   return output.gas_obj;
+
+}
+
+
+inline static void save_wind_object(Winddata &wind_obj,std::string env_dir)
+{
+  std::string filename = "conf/environments/"+env_dir +"/wind_data.bin"; 
+  std::ofstream os(filename, std::ios::binary);
+  {
+    cereal::BinaryOutputArchive ar(os);
+    MyWindType m;
+    m.wind_obj = wind_obj;
+    ar( m );
+  }
+}
+
+
+inline static Winddata load_wind_object(std::string env_dir)
+{
+  std::string filename = "conf/environments/"+env_dir +"/wind_data.bin"; 
+  std::ifstream os(filename, std::ios::binary);
+  cereal::BinaryInputArchive iarchive(os);
+  MyWindType output;
+  iarchive(output);
+  return output.wind_obj;
 
 }
 

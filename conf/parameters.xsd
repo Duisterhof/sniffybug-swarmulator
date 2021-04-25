@@ -21,6 +21,8 @@
       <xs:element name="gas_seeking" type="xs:string"/>
       <xs:element name="gas_euclidean" type="xs:string"/>
       <xs:element name="env_pipe_mode" type="xs:string"/>
+      <xs:element name="num_laser_rangers" type="xs:integer"/>
+      <xs:element name="wind_data" type="xs:string"/>
       <!-- xs:element name="parameter_name" type="xs:parametertype"/-->
     </xs:sequence>
   </xs:complexType>

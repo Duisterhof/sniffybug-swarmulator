@@ -8,16 +8,17 @@ void load_all_lasers(const uint16_t ID)
   
   std::vector<laser_ray> laser_rays; // contains all laser ray objects
     
+  int num_rays = param->num_laser_rangers();
 
   // load laser rays
-  for (int i = 0; i<4; i++)
+  for (int i = 0; i<num_rays; i++)
 	{
     laser_ray ray;
-    ray.heading = laser_headings[i];
+    ray.heading = M_PI*2./(float)(num_rays)*i;
 		laser_rays.push_back(ray);
 	}
 
-  for (int i = 0; i<4; i++)
+  for (uint i = 0; i<laser_rays.size(); i++)
   {
     laser_rays[i] = get_laser_reads(laser_rays[i],ID);
   }

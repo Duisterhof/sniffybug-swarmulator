@@ -27,13 +27,12 @@ void Environment::load(int argc, char *argv[]){
   }
   terminalinfo::debug_msg(environment.env_dir);
   
-
-  generate_dungeon();
-
   string s = param->agent_initialization();
+
   if (!strcmp(s.c_str(), "in_area")){
-    complete_folder();
+    complete_folder(); // runs python script to get headings and spawn points within free area
   }
+
   load_gas_data();
 
   define_walls();
@@ -51,7 +50,7 @@ void Environment::load(int argc, char *argv[]){
 
 void Environment::load_gas_data(void){
   string s = param->gas_seeking();
-  string euclidean = param->gas_euclidean();
+  string euclidean = param->gas_euclidean(); // feed euclidean distance instead of gas concentration (debugging)
   std::string bmp_filename;
   string filename = "conf/environments/" + environment.env_dir + "/gas_simulations/iteration_";
   string gas_obj_file = "conf/environments/" + environment.env_dir + "/gas_data.bin";
@@ -60,11 +59,11 @@ void Environment::load_gas_data(void){
 
   if (!strcmp(s.c_str(), "True") && !strcmp(euclidean.c_str(), "False")){
     
-
     if (gas_obj_exists)
     {
       gas_obj = load_gas_object(environment.env_dir);
     }
+
     else
     {
       bool last_file_found = false;
@@ -78,12 +77,10 @@ void Environment::load_gas_data(void){
         last_file_found = true;
       }
       else{
-        #ifdef ANIMATION
           bmp_filename = filename+std::to_string(i)+".bmp";
           save_as_bmp(bmp_filename.c_str(),gas_obj, i);
           gas_obj.num_it = i;
           i++;
-        #endif
       }
       save_gas_object(gas_obj,environment.env_dir);
     
@@ -95,6 +92,42 @@ void Environment::load_gas_data(void){
     load_gas_file(filename+std::to_string(0),true,gas_obj);
   }
 }
+
+void Environment::load_wind_data(void){
+  string s = param->wind_data();
+
+  string filename = "conf/environments/" + environment.env_dir + "/wind_simulations/_";
+  string wind_obj_file = "conf/environments/" + environment.env_dir + "/wind_data.bin";
+
+  ifstream f(wind_obj_file.c_str());
+  bool wind_obj_exists = f.good();
+
+  if (!strcmp(s.c_str(), "True")){
+    
+    if (wind_obj_exists)
+    {
+      wind_obj = load_wind_object(environment.env_dir);
+    }
+    
+    else
+    {
+      bool last_file_found = false;
+      int i = 0;
+      terminalinfo::debug_msg("loading gas data ");
+      while (!last_file_found)
+      {
+      
+      if(! load_wind_file(filename+std::to_string(i),true,wind_obj) || (i > (int)(param->time_limit())))
+      {
+        last_file_found = true;
+      }
+      save_wind_object(wind_obj,environment.env_dir);
+    
+    }
+    }    
+  }
+}
+
 
 void Environment::get_min_max(std::vector<std::vector<float>> walls)
 {

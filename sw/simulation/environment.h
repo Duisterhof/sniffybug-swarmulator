@@ -44,6 +44,41 @@ class Gasdata
     }
 
 };
+
+class Winddata
+{
+  public:
+    Winddata() = default;
+    int num_it;
+    std::vector<float> source_location;
+    std::vector<float> env_min;
+    std::vector<float> env_max;
+    std::vector<float> cell_sizes;
+    std::vector<int> numcells;
+    std::vector<std::vector<std::vector<int>>> wind_data;
+    std::vector<int> max_wind;
+
+  private:
+    friend class cereal::access;
+
+    // cereal supports class versioning although it is considered
+    // optional in cereal
+    template <class Archive>
+    void save( Archive & ar, std::uint32_t const version ) const
+    {
+      ar( num_it,source_location,env_min,env_max,cell_sizes,numcells,wind_data,max_wind); // operator() is the preferred way of interfacing the archive
+    }
+
+    template <class Archive>
+    void load( Archive & ar, std::uint32_t const version )
+    {
+      ar( num_it,source_location,env_min,env_max,cell_sizes,numcells,wind_data,max_wind); // operator() is the preferred way of interfacing the archive
+    }
+
+};
+
+
+
 class SomeData
 {
   public:
@@ -84,6 +119,7 @@ public:
   float x_min,x_max,y_min,y_max, env_size, env_diagonal;
   std::string env_dir;
   Gasdata gas_obj; //obj containing all gas information for this environment
+  Winddata wind_obj; // obj containing all wind information for this env
   std::vector<std::vector<float>> food;
   std::vector<float> beacon;
   std::vector<std::vector<float>> free_points;
@@ -116,6 +152,8 @@ void load(int argc, char *argv[]);
 */
 void load_gas_data(void);
 
+
+void load_wind_data(void);
 
 /**
  * Gets x_min, x_max, y_min, y_max for a given env

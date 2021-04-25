@@ -35,6 +35,12 @@ void Environment::load(int argc, char *argv[]){
 
   load_gas_data();
 
+  s = param->wind_data();
+  if(!strcmp(s.c_str(), "True"))
+  {
+    load_wind_data();
+  }
+
   define_walls();
  
   save_gas_object(gas_obj,environment.env_dir);
@@ -95,7 +101,6 @@ void Environment::load_gas_data(void){
 
 void Environment::load_wind_data(void){
   string s = param->wind_data();
-
   string filename = "conf/environments/" + environment.env_dir + "/wind_simulations/_";
   string wind_obj_file = "conf/environments/" + environment.env_dir + "/wind_data.bin";
 
@@ -103,7 +108,6 @@ void Environment::load_wind_data(void){
   bool wind_obj_exists = f.good();
 
   if (!strcmp(s.c_str(), "True")){
-    
     if (wind_obj_exists)
     {
       wind_obj = load_wind_object(environment.env_dir);
@@ -113,13 +117,18 @@ void Environment::load_wind_data(void){
     {
       bool last_file_found = false;
       int i = 0;
-      terminalinfo::debug_msg("loading gas data ");
+
+      terminalinfo::debug_msg("Loading wind data");
       while (!last_file_found)
       {
       
-      if(! load_wind_file(filename+std::to_string(i),true,wind_obj) || (i > (int)(param->time_limit())))
+      if(! load_wind_file(filename+std::to_string(i)+".csv",true,wind_obj, gas_obj ,environment) || (i > (int)(param->time_limit())))
       {
         last_file_found = true;
+      }
+      else
+      {
+        i++;
       }
       save_wind_object(wind_obj,environment.env_dir);
     

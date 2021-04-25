@@ -55,7 +55,7 @@ class Winddata
     std::vector<float> env_max;
     std::vector<float> cell_sizes;
     std::vector<int> numcells;
-    std::vector<std::vector<std::vector<int>>> wind_data;
+    std::vector<std::vector<std::vector<float>>> wind_data;
     std::vector<int> max_wind;
 
   private:

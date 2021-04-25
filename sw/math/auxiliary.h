@@ -23,6 +23,7 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
+
 /**
  * @brief Returns whether a number is positive or negative as a float +1, 0, -1
  *
@@ -34,6 +35,23 @@ inline static float sign(float x)
   if (x > 0) { return 1; }
   if (x < 0) { return -1; }
   return 0;
+}
+
+// clips value between min and max
+inline static int clip(int input, int min, int max)
+{
+  if (input>max)
+  {
+    return max;
+  }
+  else if (input <min)
+  {
+    return min;
+  }
+  else
+  {
+    return input;
+  }
 }
 
 /**
@@ -229,9 +247,65 @@ inline static std::vector<float> load_vector(const std::string filename)
 
 
 
-inline static int load_wind_file(const std::string filename, const bool first_file, Winddata &wind_obj)
+inline static int load_wind_file(const std::string filename, const bool first_file, Winddata &wind_obj, Gasdata &gas_obj, Environment &environment)
 {
-  return 1;
+  std::ifstream myFile(filename.c_str());
+  std::string line;
+  float val;
+  std::vector<std::vector<std::vector<float>>> temp_wind_arr(gas_obj.numcells[0],std::vector<std::vector<float>> (gas_obj.numcells[1],{0.0,0.0,0.0}));
+
+  if(myFile.is_open())
+  {
+
+    std::getline(myFile, line); // first line with column names
+    // Read data, line by line
+    while(std::getline(myFile, line))
+    {
+
+        // Create a stringstream of the current line
+        std::stringstream ss(line);
+        std::vector<float> position{0.0,0.0,0.0};
+        std::vector<float> wind{0.0,0.0,0.0};
+        // Keep track of the current column index
+        int colIdx = 0;
+        
+        // Extract each integer
+        while(ss >> val){
+            
+            if (colIdx <= 2)
+            {
+              wind[colIdx] = val;
+            }
+            else
+            {
+              position[colIdx-3] = val;
+            }
+            
+            // If the next token is a comma, ignore it and move on
+            if(ss.peek() == ',') ss.ignore();
+            
+            // Increment the column index
+            colIdx++;
+        }
+      
+      if (position[2] < 0.05 )
+      {
+        int x_indx = clip((int)((position[0]-environment.x_min)/(environment.x_max-environment.x_min)*(float)(environment.gas_obj.numcells[0])),0,environment.gas_obj.numcells[0]);
+        int y_indx = clip((int)((position[1]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.gas_obj.numcells[1])),0,environment.gas_obj.numcells[1]);
+        temp_wind_arr[x_indx][y_indx] = wind;
+      }
+
+    }
+
+    wind_obj.wind_data = temp_wind_arr;
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+
+  
 }
 
 
@@ -423,22 +497,7 @@ inline static std::vector<float> read_vector(const std::string filename)
   return matrix;
 }
 
-// clips value between min and max
-inline static int clip(int input, int min, int max)
-{
-  if (input>max)
-  {
-    return max;
-  }
-  else if (input <min)
-  {
-    return min;
-  }
-  else
-  {
-    return input;
-  }
-}
+
 
 /**
  * Read an array from a txt file

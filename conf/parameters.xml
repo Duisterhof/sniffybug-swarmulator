@@ -28,5 +28,5 @@
   <gas_euclidean>False</gas_euclidean>
   <env_pipe_mode>True</env_pipe_mode>
   <num_laser_rangers> 4 </num_laser_rangers>
-  <wind_data> True </wind_data>
+  <wind_data>True</wind_data>
 </parameters>

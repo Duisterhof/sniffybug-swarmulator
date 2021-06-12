@@ -616,6 +616,19 @@ inline static void cap_laser(int* idx)
   }
 }
 
+inline static void cap_value(int* input, int min, int max)
+{
+  if(*(input) < min)
+  {
+    *(input) = min;
+  }
+
+  if(*(input) > max)
+  {
+    *(input) = max;
+  }
+}
+
 /**
  * construct line from point P1 to point P2
 */

@@ -53,6 +53,11 @@ And access the documentation using
 
     xdg-open docs/html/index.html 
 
+## Building for gas seeking
+
+make -j ANIMATION=ON VERBOSE=ON CONTROLLER=bug_repulsion AGENT=particle_oriented_xy
+
+
 ## Running Swarmulator
 Swarmulator can be launched from the terminal. To run Swarmulator, use the following command: 
 

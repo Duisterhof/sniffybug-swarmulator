@@ -515,6 +515,7 @@ void gradient_seeker::generate_new_wp(const uint16_t ID)
   goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
 
   s.at(ID)->goal = goal; 
+  s.at(ID)->gas_read = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][current_x_indx][current_y_indx]);
   get_new_line();
   update_direction(ID);
   status = 0;

@@ -125,6 +125,9 @@ public:
   std::vector<std::vector<float>> free_points;
   std::vector<float> headings;
   std::vector<std::vector<float>> walls;
+  std::vector<std::vector<float>> u_wind;
+  std::vector<std::vector<float>> v_wind;
+
   float nest;
   float best_gas = -1.0; //best seen gas concentration in environment
   float best_gas_pos_x = 0.0;

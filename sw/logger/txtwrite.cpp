@@ -32,6 +32,9 @@ void txtwrite::txtwrite_state(ofstream &logfile)
     for (uint16_t j = 0; j < 2; j++) {
       logfile << state_buff[i]->state.at(j) << " ";
     }
+    // log gas readings
+    logfile << s.at(i)->gas_read << " ";
+  
 #ifdef ESTIMATOR
     if (pr.estimator_active) {
       logfile << pr.s_kp1[i] << " " << f;

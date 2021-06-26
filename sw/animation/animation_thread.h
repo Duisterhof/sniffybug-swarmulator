@@ -56,7 +56,8 @@ void main_loop_function()
       // Input: ID, p_x global, p_y global, orientation global
       drawer.agent(ID, s[ID]->state.at(0), s[ID]->state.at(1), s[ID]->orientation);
       // Input: ID, p_x global, p_y global, v_x global, v_y global
-      drawer.velocity_arrow(ID,  s[ID]->state.at(0), s[ID]->state.at(1), s[ID]->state.at(2), s[ID]->state.at(3));
+      // drawer.velocity_arrow(ID,  s[ID]->state.at(0), s[ID]->state.at(1), s[ID]->state.at(2), s[ID]->state.at(3));
+      drawer.velocity_arrow(ID,  s[ID]->state.at(0), s[ID]->state.at(1), sinf(s[ID]->gradient_direction), cosf(s[ID]->gradient_direction));
       drawer.red_point(s[ID]->goal.x,s[ID]->goal.y);
       drawer.yellow_point(environment.best_gas_pos_x,environment.best_gas_pos_y);
       // drawer.segment(s.at(ID)->line.p0.x,s.at(ID)->line.p0.y,s.at(ID)->line.p1.x,s.at(ID)->line.p1.y);

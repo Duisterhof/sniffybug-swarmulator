@@ -38,7 +38,12 @@ void Environment::load(int argc, char *argv[]){
   s = param->wind_data();
   if(!strcmp(s.c_str(), "True"))
   {
-    load_wind_data();
+    std::string U_txt_filename = "conf/environments/" + environment.env_dir  + "/wind_simulations/U_grid.txt";
+    std::string V_txt_filename = "conf/environments/" + environment.env_dir  + "/wind_simulations/V_grid.txt";
+
+    environment.u_wind = read_points(U_txt_filename);
+    environment.v_wind = read_points(V_txt_filename);
+
   }
 
   define_walls();

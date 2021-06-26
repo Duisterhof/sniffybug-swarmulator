@@ -1,4 +1,4 @@
-#include "bug_repulsion.h"
+#include "wind_seeker.h"
 #include "draw.h"
 #include "randomgenerator.h"
 #include <tuple>
@@ -8,7 +8,7 @@
 #include "omniscient_observer.h"
 #include "gas_sensors.h"
 
-void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v_y)
+void wind_seeker::get_velocity_command(const uint16_t ID, float &v_x, float &v_y)
 {
   state = s.at(ID)->state; // load agent state
   load_all_lasers(ID);
@@ -20,15 +20,6 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
 
   s.at(ID)->line = line_to_goal;
 
-  // give each agent a new WP when a better place is found
-  if (environment.best_gas > best_known_conc)
-  {
-    best_known_conc = environment.best_gas;
-    generate_new_wp(ID);
-    status = 0;
-    previous_status = 0;
-  }
-
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
     generate_new_wp(ID);
@@ -37,12 +28,12 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
   }
   else if (simtime_seconds == 0.0)
   {
-    // initial velocity for everyone
-    goal = {.x = rg.uniform_float(environment.x_min,environment.x_max), .y=rg.uniform_float(environment.y_min,environment.y_max)};
-    s.at(ID)->goal = goal; 
-    get_new_line();
-    update_direction(ID);
+    generate_new_wp(ID);
+    status = 0;
+    previous_status = 0;
   }
+
+  update_animation_direction(ID);
 
   update_status(ID); // get new status
   // status = 2;
@@ -71,19 +62,8 @@ void bug_repulsion::get_velocity_command(const uint16_t ID, float &v_x, float &v
       s.at(ID)->first_in_source = simtime_seconds;
     }
   }
-
-  // terminalinfo::debug_msg(std::to_string(status));
-  // terminalinfo::debug_msg(std::to_string(search_left));
-  // terminalinfo::debug_msg(std::to_string(v_y));
-  
-  // v_x = 0.9*old_vx + 0.1*v_x;
-  // v_y = 0.9*old_vy + 0.1*v_y;
-
-  // old_vx = v_x;
-  // old_vy = v_y;
-
 }
-bool bug_repulsion::check_back_in_line(void)
+bool wind_seeker::check_back_in_line(void)
 {
   float dist = get_distance_to_line(line_to_goal,agent_pos);
   float dist_goal = getDistance(agent_pos,goal);
@@ -104,7 +84,7 @@ bool bug_repulsion::check_back_in_line(void)
 }
 
 
-void bug_repulsion::wall_follow_init(const uint16_t ID)
+void wind_seeker::wall_follow_init(const uint16_t ID)
 {
   init_dist_to_goal = getDistance(agent_pos,goal);
   left_line_zone = false;
@@ -135,7 +115,7 @@ void bug_repulsion::wall_follow_init(const uint16_t ID)
   
 }
 
-bool bug_repulsion::free_to_goal(const uint16_t ID)
+bool wind_seeker::free_to_goal(const uint16_t ID)
 {
   if (s.at(ID)->laser_ranges[lower_idx] > laser_warning && s.at(ID)->laser_ranges[upper_idx] > laser_warning)
   {
@@ -149,7 +129,7 @@ bool bug_repulsion::free_to_goal(const uint16_t ID)
   
 }
 
-void bug_repulsion::check_passed_goal(const uint16_t ID)
+void wind_seeker::check_passed_goal(const uint16_t ID)
 {
   float current_heading_to_goal = get_heading_to_point(agent_pos,goal);
   float following_heading = following_laser*M_PI_2 + s.at(ID)->get_orientation();
@@ -160,7 +140,7 @@ void bug_repulsion::check_passed_goal(const uint16_t ID)
 }
 
 
-void bug_repulsion::update_start_laser(void)
+void wind_seeker::update_start_laser(void)
 {
   if (search_left)
   {
@@ -186,7 +166,7 @@ void bug_repulsion::update_start_laser(void)
   }
 }
 
-bool bug_repulsion::avoided_obstacle(const uint16_t ID)
+bool wind_seeker::avoided_obstacle(const uint16_t ID)
 {
   // if (get_distance_to_line(line_to_goal,agent_pos) > line_max_dist)
   // {
@@ -256,7 +236,7 @@ bool bug_repulsion::avoided_obstacle(const uint16_t ID)
   return avoiding;
 }
 
-void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
+void wind_seeker::follow_wall(const uint16_t ID, float* v_x, float* v_y)
 {
   // terminalinfo::debug_msg(std::to_string(search_left));
   update_start_laser(); // avoid osscialations
@@ -319,7 +299,7 @@ void bug_repulsion::follow_wall(const uint16_t ID, float* v_x, float* v_y)
   *(v_y) = sinf(following_laser*M_PI_2)*desired_velocity;
 }
 
-void bug_repulsion::reset_wall_follower(void)
+void wind_seeker::reset_wall_follower(void)
 {
   if (search_left)
   {
@@ -333,7 +313,7 @@ void bug_repulsion::reset_wall_follower(void)
   
 }
 
-void bug_repulsion::update_swarm_cg(const uint16_t ID)
+void wind_seeker::update_swarm_cg(const uint16_t ID)
 {
   if (nagents > 1)
   {
@@ -356,7 +336,7 @@ void bug_repulsion::update_swarm_cg(const uint16_t ID)
   
 }
 
-void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
+void wind_seeker::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
 {
   *(v_x) = 0;
   *(v_y) = 0;
@@ -401,7 +381,7 @@ void bug_repulsion::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
   
 }
 
-void bug_repulsion::update_status(const uint16_t ID)
+void wind_seeker::update_status(const uint16_t ID)
 {
   closest_agents = o.request_closest(ID);
   // terminalinfo::debug_msg(std::to_string(free_to_goal(ID)));
@@ -436,13 +416,13 @@ void bug_repulsion::update_status(const uint16_t ID)
 
 }
 
-float bug_repulsion::get_agent_dist(const uint16_t ID1, const uint16_t ID2)
+float wind_seeker::get_agent_dist(const uint16_t ID1, const uint16_t ID2)
 {
   return(sqrtf(powf(s.at(ID1)->state[0]-s.at(ID2)->state[0],2)+powf(s.at(ID1)->state[1]-s.at(ID2)->state[1],2)));
 }
 
 // updates individual and swarm best wps
-void bug_repulsion::get_new_line(void)
+void wind_seeker::get_new_line(void)
 {
   line_to_goal.p0 = agent_pos;
   line_to_goal.p1 = goal;
@@ -450,7 +430,7 @@ void bug_repulsion::get_new_line(void)
 
 }
 
-void bug_repulsion::update_follow_laser(void)
+void wind_seeker::update_follow_laser(void)
 {
   if (get_heading_to_point(agent_pos,goal) > line_heading)
   {
@@ -464,7 +444,7 @@ void bug_repulsion::update_follow_laser(void)
 }
 
 // called when following the line within a corridor
-void bug_repulsion::follow_line(const uint16_t ID, float* v_x, float* v_y)
+void wind_seeker::follow_line(const uint16_t ID, float* v_x, float* v_y)
 {
   // check_passed_goal(ID);
   if (get_distance_to_line(line_to_goal,agent_pos) > line_max_dist)
@@ -476,14 +456,13 @@ void bug_repulsion::follow_line(const uint16_t ID, float* v_x, float* v_y)
   *(v_y) = sinf(following_heading)*desired_velocity;
 }
 
-void bug_repulsion::update_best_wps(const uint16_t ID)
+void wind_seeker::update_best_wps(const uint16_t ID)
 {
   // load gas concentration at current position
   int x_indx = clip((int)((s.at(ID)->state[1]-environment.x_min)/(environment.x_max-environment.x_min)*(float)(environment.gas_obj.numcells[0])),0,environment.gas_obj.numcells[0]);
   int y_indx = clip((int)((s.at(ID)->state[0]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.gas_obj.numcells[1])),0,environment.gas_obj.numcells[1]);
   float gas_conc = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][x_indx][y_indx]);
 
-  s.at(ID)->gas_read = gas_conc;
   // update best found agent position and best found swarm position if required
   if( gas_conc > s.at(ID)->best_agent_gas)
   {
@@ -498,36 +477,60 @@ void bug_repulsion::update_best_wps(const uint16_t ID)
   }
 }
 
-void bug_repulsion::generate_new_wp(const uint16_t ID)
+void wind_seeker::generate_new_wp(const uint16_t ID)
 {
-  // update_swarm_cg(ID);
   iteration_start_time = simtime_seconds;
-  float r_p = rg.uniform_float(0,1);
-  float r_g = rg.uniform_float(0,1);	  
 
+  int x_indx = clip((int)((s.at(ID)->state[1]-environment.x_min)/(environment.x_max-environment.x_min)*(float)(environment.gas_obj.numcells[0])),0,environment.gas_obj.numcells[0]);
+  int y_indx = clip((int)((s.at(ID)->state[0]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.gas_obj.numcells[1])),0,environment.gas_obj.numcells[1]);
+  float gas_conc = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][x_indx][y_indx]);
 
-  if (environment.best_gas > 0)
-  { 
-  float v_x = omega*(goal.x-agent_pos.x)+phi_p*r_p*(s.at(ID)->best_agent_pos.x-agent_pos.x)+phi_g*r_g*(environment.best_gas_pos_x-agent_pos.x);
-  float v_y = omega*(goal.y-agent_pos.y)+phi_p*r_p*(s.at(ID)->best_agent_pos.y-agent_pos.y)+phi_g*r_g*(environment.best_gas_pos_y-agent_pos.y);
-  goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
+  // wind angle computation
+  int current_x_wind_indx = clip((int)((s.at(ID)->state[1]-environment.x_min)/(environment.x_max-environment.x_min)*(float)(environment.u_wind.size())),0,environment.u_wind.size());
+  int current_y_wind_indx = clip((int)((s.at(ID)->state[0]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.u_wind[0].size())),0,environment.u_wind[0].size());
+
+  float u_vel = environment.u_wind[current_x_wind_indx][current_y_wind_indx];
+  float v_vel = environment.v_wind[current_x_wind_indx][current_y_wind_indx];
+
+  float gradient_direction;
+
+  if (false)
+  {
+    std::cout << "random brah" << std::endl;
+    gradient_direction = rg.uniform_float(0,M_PI*2); // this means the gradient is unknown so in a random direction.
   }
   else
   {
-    random_point = {.x = rg.uniform_float(environment.x_min,environment.x_max),.y = rg.uniform_float(environment.y_min,environment.y_max)};
-    float v_x = rand_p_pre*(random_point.x-agent_pos.x)+omega_pre*(goal.x-agent_pos.x);
-    float v_y = rand_p_pre*(random_point.y-agent_pos.y)+omega_pre*(goal.y-agent_pos.y);
-    goal = {.x = agent_pos.x + v_x,.y = agent_pos.y+v_y}; 
+    gradient_direction = atan2f(v_vel,u_vel) + M_PI ;
+    std::cout << "not random brah" << std::endl;
   }
-  
+
+  goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
 
   s.at(ID)->goal = goal; 
+  s.at(ID)->gas_read = gas_conc;
   get_new_line();
   update_direction(ID);
   status = 0;
+
 }
 
-void bug_repulsion::update_direction(const uint16_t ID)
+void wind_seeker::update_animation_direction(const uint16_t ID)
+{
+
+  // wind angle computation
+  int current_x_wind_indx = clip((int)((s.at(ID)->state[1]-environment.x_min)/(environment.x_max-environment.x_min)*(float)(environment.u_wind.size())),0,environment.u_wind.size());
+  int current_y_wind_indx = clip((int)((s.at(ID)->state[0]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.u_wind[0].size())),0,environment.u_wind[0].size());
+
+  float u_vel = environment.u_wind[current_x_wind_indx][current_y_wind_indx];
+  float v_vel = environment.v_wind[current_x_wind_indx][current_y_wind_indx];
+
+  float gradient_direction = atan2f(v_vel,u_vel) + M_PI ;
+  
+  s.at(ID)->gradient_direction = gradient_direction;
+}
+
+void wind_seeker::update_direction(const uint16_t ID)
 {
   line_heading = get_heading_to_point(agent_pos,goal); // used to follow the line
   corrected_heading = line_heading - s.at(ID)->get_orientation();
@@ -550,7 +553,7 @@ void bug_repulsion::update_direction(const uint16_t ID)
   
 }
 
-void bug_repulsion::animation(const uint16_t ID)
+void wind_seeker::animation(const uint16_t ID)
 {
   /*** Draw a cricle as agent ***/
   draw d;

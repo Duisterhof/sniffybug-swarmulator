@@ -937,6 +937,4 @@ inline static Winddata load_wind_object(std::string env_dir)
 }
 
 
-
-
 #endif /*AUXILIARY_H*/

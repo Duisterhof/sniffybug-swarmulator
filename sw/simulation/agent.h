@@ -37,6 +37,7 @@ public:
   float manualx, manualy;
   bool manual;
   float manualpsi_delta;
+  float gradient_direction{0.0};
   float gas_read = 0; //either gas concentration or distance to source
   float gas_read_lp = 1.0;
   float laser_collision_threshold = 0.1; //if one of the laser rangers detects < 0.1 [m], we count it as a collision

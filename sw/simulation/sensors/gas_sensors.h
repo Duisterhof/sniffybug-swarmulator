@@ -37,6 +37,6 @@ class laser_ray
 laser_ray get_laser_reads(laser_ray ray, const uint16_t ID);
 void load_all_lasers(const uint16_t ID);
 
-inline std::vector<float> laser_headings ;	// headings in body frame of all lasers
+inline std::vector<float> laser_headings = {0,M_PI_2,M_PI,3*M_PI_2} ;	// headings in body frame of all lasers
 
 #endif

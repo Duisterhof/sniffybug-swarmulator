@@ -93,7 +93,6 @@ public:
 	
 	int following_laser; // laser that we're following in body frame heading defined in 'laser_headings'
 	float following_heading; // corresponding heading, in body frame
-
 	
 	float desired_velocity = 0.5; // [m/s]
 

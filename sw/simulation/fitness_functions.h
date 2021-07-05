@@ -94,11 +94,11 @@ inline static void source_distance_avg(float &f)
   for(uint ID =0; ID<nagents; ID++)
   {
     source_dist += s.at(ID)->distance_accumulator/(float)(s.at(ID)->num_steps);
-    if (s.at(ID)->is_crashed)
-    {
-      source_dist += environment.env_diagonal;
+    // if (s.at(ID)->is_crashed)
+    // {
+    //   source_dist += 1.0;
       
-    }
+    // }
   }
   f = source_dist/(float)(nagents);
 

@@ -149,6 +149,7 @@ class swarmulator:
 	def _launch_envs(self, env, run_id):
 		'''Launches an instance of a swarmulator simulation'''
 		cmd = "cd " + self.path + " && ./swarmulator " + str(self.n_agents) + " " + str(run_id) + " " + env +  " &"
+		print(cmd)
 		subprocess.call(cmd, shell=True)
 		if self.verbose: print("Launched instance of swarmulator with %s robots and pipe ID %s" % (self.n_agents,run_id))
 

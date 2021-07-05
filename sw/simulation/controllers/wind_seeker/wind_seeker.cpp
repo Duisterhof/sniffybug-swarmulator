@@ -496,16 +496,24 @@ void wind_seeker::generate_new_wp(const uint16_t ID)
 
   if (false)
   {
-    std::cout << "random brah" << std::endl;
-    gradient_direction = rg.uniform_float(0,M_PI*2); // this means the gradient is unknown so in a random direction.
+    gradient_direction = rg.uniform_float(0,M_PI*2);
+    if (has_seen_gas)
+    {
+        goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel_after_gas ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel_after_gas}; 
+    }
+    else
+    {
+      goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
+    }
+     // this means the gradient is unknown so in a random direction.
   }
   else
   {
-    gradient_direction = atan2f(v_vel,u_vel) + M_PI ;
-    std::cout << "not random brah" << std::endl;
+    has_seen_gas = true;
+    gradient_direction = atan2f(v_vel,u_vel) + M_PI ; // +PI since we're travelling into the wind
+    goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel_after_gas ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel_after_gas}; 
   }
 
-  goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
 
   s.at(ID)->goal = goal; 
   s.at(ID)->gas_read = gas_conc;

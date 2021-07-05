@@ -51,6 +51,7 @@ public:
 	float phi_p = policy_params[1];
 	float phi_g = policy_params[2];
 	float wp_travel = 3.0;
+	float wp_travel_after_gas = 1.0;
 
 	float omega_pre = policy_params[3];
 	float rand_p_pre = policy_params[4];
@@ -84,6 +85,7 @@ public:
 	float min_obs_avoid_thres = 2.0; // minimum distance to have moved when avoiding obstacle
 
 	bool search_left = false; // searching direction when wall-following
+	bool has_seen_gas{false};
 
 	bool left_line_zone = false;
 	

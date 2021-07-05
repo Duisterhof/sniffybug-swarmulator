@@ -50,6 +50,7 @@ public:
 	float phi_p = policy_params[1];
 	float phi_g = policy_params[2];
 	float wp_travel = 3.0;
+	float wp_after_gas = 1.0;
 
 	float omega_pre = policy_params[3];
 	float rand_p_pre = policy_params[4];

@@ -55,7 +55,7 @@ void gradient_seeker::get_velocity_command(const uint16_t ID, float &v_x, float 
   if (distance_to_source < close_to_source_thres)
   {
     s.at(ID)->num_close_to_source += 1;
-    if(s.at(ID)->first_in_source == 500)
+    if(s.at(ID)->first_in_source == 100)
     {
       s.at(ID)->first_in_source = simtime_seconds;
     }
@@ -500,19 +500,17 @@ void gradient_seeker::generate_new_wp(const uint16_t ID)
   float gradient_y = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][current_x_indx][gradient_y_max]) - (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][current_x_indx][gradient_y_min]);
   float gradient_direction;
 
-  if (gradient_x == 0 || gradient_y == 0)
+  if (gradient_x == 0 && gradient_y == 0)
   {
-    std::cout << "random brah" << std::endl;
     gradient_direction = rg.uniform_float(0,M_PI*2); // this means the gradient is unknown so in a random direction.
+    goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
   }
   else
   {
     gradient_direction = atan2f(gradient_y,gradient_x);
-    std::cout << "not random brah" << std::endl;
-
+    goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_after_gas ,.y = agent_pos.y+sinf(gradient_direction)*wp_after_gas}; 
   }
 
-  goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
 
   s.at(ID)->goal = goal; 
   s.at(ID)->gas_read = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][current_x_indx][current_y_indx]);

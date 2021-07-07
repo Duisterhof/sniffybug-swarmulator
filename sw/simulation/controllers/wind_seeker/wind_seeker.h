@@ -35,6 +35,7 @@ public:
 	void update_animation_direction(const uint16_t ID);
 	// float get_laser_min(const uint16_t ID);
 	std::vector<float> policy_params = load_vector("conf/policies/gas_params.txt");
+	std::vector<float> last_seen_plume; // a vector with coordinates of the last point we've seen with gas, used to coordinate
 	random_generator rg;
 	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position, swarm_cg;	// agent position point struct
 	Line line_to_goal; // line to goal waypoint
@@ -50,8 +51,8 @@ public:
 	float omega = policy_params[0];
 	float phi_p = policy_params[1];
 	float phi_g = policy_params[2];
-	float wp_travel = 3.0;
-	float wp_travel_after_gas = 1.0;
+	float wp_travel = 2.0;
+	float wp_travel_after_gas = 1.5;
 
 	float omega_pre = policy_params[3];
 	float rand_p_pre = policy_params[4];
@@ -85,7 +86,6 @@ public:
 	float min_obs_avoid_thres = 2.0; // minimum distance to have moved when avoiding obstacle
 
 	bool search_left = false; // searching direction when wall-following
-	bool has_seen_gas{false};
 
 	bool left_line_zone = false;
 	

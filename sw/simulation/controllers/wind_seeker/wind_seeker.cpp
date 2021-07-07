@@ -57,7 +57,7 @@ void wind_seeker::get_velocity_command(const uint16_t ID, float &v_x, float &v_y
   if (distance_to_source < close_to_source_thres)
   {
     s.at(ID)->num_close_to_source += 1;
-    if(s.at(ID)->first_in_source == 500)
+    if(s.at(ID)->first_in_source == 100)
     {
       s.at(ID)->first_in_source = simtime_seconds;
     }
@@ -463,6 +463,11 @@ void wind_seeker::update_best_wps(const uint16_t ID)
   int y_indx = clip((int)((s.at(ID)->state[0]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.gas_obj.numcells[1])),0,environment.gas_obj.numcells[1]);
   float gas_conc = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][x_indx][y_indx]);
 
+  if (gas_conc > 0)
+  {
+    last_seen_plume = {agent_pos.x, agent_pos.y};
+  }
+
   // update best found agent position and best found swarm position if required
   if( gas_conc > s.at(ID)->best_agent_gas)
   {
@@ -494,12 +499,12 @@ void wind_seeker::generate_new_wp(const uint16_t ID)
 
   float gradient_direction;
 
-  if (false)
+  if (gas_conc==0)
   {
     gradient_direction = rg.uniform_float(0,M_PI*2);
-    if (has_seen_gas)
+    if (!last_seen_plume.empty())
     {
-        goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel_after_gas ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel_after_gas}; 
+        goal = {.x = last_seen_plume[0] + cosf(gradient_direction)*wp_travel_after_gas ,.y = last_seen_plume[1]+sinf(gradient_direction)*wp_travel_after_gas}; 
     }
     else
     {
@@ -509,7 +514,7 @@ void wind_seeker::generate_new_wp(const uint16_t ID)
   }
   else
   {
-    has_seen_gas = true;
+
     gradient_direction = atan2f(v_vel,u_vel) + M_PI ; // +PI since we're travelling into the wind
     goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel_after_gas ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel_after_gas}; 
   }

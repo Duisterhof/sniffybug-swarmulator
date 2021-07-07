@@ -23,10 +23,10 @@
   <!-- Additional parameters -->
   <policy>conf/policies/gas_params.txt</policy>
   <policy_shape>conf/policies/gas_shape.txt</policy_shape>
-  <fitness>source_first</fitness>
+  <fitness>source_distance_avg</fitness>
   <gas_seeking>True</gas_seeking>
   <gas_euclidean>False</gas_euclidean>
   <env_pipe_mode>True</env_pipe_mode>
   <num_laser_rangers> 4 </num_laser_rangers>
-  <wind_data>False</wind_data>
+  <wind_data>True</wind_data>
 </parameters>

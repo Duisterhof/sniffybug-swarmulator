@@ -53,7 +53,7 @@ public:
   float distance_accumulator = 0.0;
   int num_steps = 0;
   int num_close_to_source = 0;
-  float first_in_source = 500.0;
+  float first_in_source = 100.0;
   bool is_crashed = false;
   /**
    * Returns the position of the agent along a certain dimension (i.e., North(0) and East(1))

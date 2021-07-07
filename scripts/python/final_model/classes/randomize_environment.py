@@ -1,7 +1,7 @@
 import numpy as np
 import glob
 
-def get_spawn_pos(n_agents,folder='../../../conf/environments/',min_dist=0.5):
+def get_spawn_pos(n_agents,folder='../../../conf/environments/',min_dist=1.0):
     files = [file for file in glob.glob(folder+'*/free_pnts.txt')]
 
     for file in files:
@@ -44,4 +44,4 @@ def check_distance(points, min_dist):
 
 
 if __name__ == '__main__':
-    get_spawn_pos(2)
+    get_spawn_pos(3)

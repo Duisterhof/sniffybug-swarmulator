@@ -24,6 +24,8 @@ public:
 	float get_agent_dist(const uint16_t ID1, const uint16_t ID2);
 	void follow_wall(const uint16_t ID, float* v_x, float* v_y);
 	void repulse_swarm(const uint16_t ID, float* v_x, float* v_y);
+	void determine_gradient(const uint16_t ID, float* v_x, float* v_y);
+
 	void wall_follow_init(const uint16_t ID);
 	void update_start_laser(void);
 	void reset_wall_follower(void);
@@ -35,9 +37,18 @@ public:
 	// float get_laser_min(const uint16_t ID);
 	std::vector<float> policy_params = load_vector("conf/policies/gas_params.txt");
 	random_generator rg;
-	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position, swarm_cg;	// agent position point struct
+	Point agent_pos, goal, random_point, other_agent_pos, start_wall_avoid, previous_position, swarm_cg, start_gradient;	// agent position point struct
 	Line line_to_goal; // line to goal waypoint
 	OmniscientObserver o; // used to get relative position of other agents
+	int gradient_search_direction;
+	int gradient_status = 0;
+	int gradient_ticker = 0;
+	int num_ticks_gradient = 15;
+	float inital_gas_read;
+	float gradient_x{0.0};
+	float gradient_y{0.0};
+	float global_gas_conc{0.0};
+	int num_ticks_wait_gradient = 10;
 
 	std::vector<float> state;
 	float iteration_start_time = 0.0; // counter to generate a new waypoint each time

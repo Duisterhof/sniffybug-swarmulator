@@ -22,18 +22,20 @@ void gradient_seeker::get_velocity_command(const uint16_t ID, float &v_x, float 
 
   if ( simtime_seconds-iteration_start_time >= update_time || getDistance(goal,agent_pos) < dist_reached_goal )
   {
-    generate_new_wp(ID);
-    status = 0;
+    status = 3;
     previous_status = 0;
   }
-  else if (simtime_seconds == 0.0)
+  else if (simtime_seconds == 0.0 || status==3)
   {
-    generate_new_wp(ID);
-    status = 0;
+    status = 3;
     previous_status = 0;
+  }
+  else
+  {
+    update_status(ID); // get new status
+
   }
 
-  update_status(ID); // get new status
   // status = 2;
   switch(status)
   {
@@ -45,6 +47,9 @@ void gradient_seeker::get_velocity_command(const uint16_t ID, float &v_x, float 
       break;
     case 2:
       repulse_swarm(ID, &v_x, &v_y);
+      break;
+    case 3:
+      determine_gradient(ID, &v_x, &v_y);
       break;
   }
 
@@ -334,6 +339,140 @@ void gradient_seeker::update_swarm_cg(const uint16_t ID)
   
 }
 
+void gradient_seeker::determine_gradient(const uint16_t ID, float* v_x, float* v_y)
+{
+  std::cout << "determining gradient " +std::to_string(simtime_seconds) <<std::endl;
+  // std::cout << std::to_string(agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation())) << std::endl;
+  // std::cout << std::to_string(agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation())) << std::endl;
+
+  switch (gradient_status)
+  {
+  case 0:
+    if(s.at(ID)->state[2] > 0.05 || s.at(ID)->state[3] > 0.05)
+    {
+      *(v_x) = 0;
+      *(v_y) = 0;
+      gradient_ticker++;
+    }
+    else
+    {
+      gradient_ticker = 0;
+      gradient_status = 1;
+    }
+  break;
+  // determine gradient in x
+  case 1:
+
+    if(gradient_ticker == 0)
+    {
+      start_gradient.x = agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation());
+      start_gradient.y = agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation());
+
+      if(s.at(ID)->laser_ranges[0] > s.at(ID)->laser_ranges[2] )
+      {
+        gradient_search_direction = 1;
+      }
+      else
+      {
+        gradient_search_direction = -1;
+      }
+      inital_gas_read = global_gas_conc;
+    }
+
+    if(gradient_ticker < num_ticks_gradient)
+    {
+      *(v_x) = gradient_search_direction*desired_velocity;
+      *(v_y) = 5.0*(start_gradient.x-(agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation())));
+      gradient_ticker++;
+    }
+    else
+    {
+      float delta_x = agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation()) - start_gradient.x;
+      float delta_y = agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation()) - start_gradient.y;
+      gradient_y = (global_gas_conc-inital_gas_read)/delta_y;
+      gradient_status = 2;
+      gradient_ticker = 0;
+      std::cout << std::to_string(delta_y) << std::endl;
+      std::cout << std::to_string(delta_x) << std::endl;
+    }
+    break;
+
+  // determine gradient in y
+
+  case 2:
+    if(s.at(ID)->state[2] > 0.05 || s.at(ID)->state[3] > 0.05)
+    {
+      *(v_x) = 0;
+      *(v_y) = 0;
+      gradient_ticker++;
+    }
+    else
+    {
+      gradient_ticker = 0;
+      gradient_status = 3;
+    }
+    break;
+  case 3:
+      if(gradient_ticker == 0)
+      {
+        start_gradient.x = agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation());
+        start_gradient.y = agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation());
+        if(s.at(ID)->laser_ranges[1] > s.at(ID)->laser_ranges[3] )
+        {
+          gradient_search_direction = 1;
+        }
+        else
+        {
+          gradient_search_direction = -1;
+        }
+        inital_gas_read = global_gas_conc;
+      }
+
+      if(gradient_ticker < num_ticks_gradient)
+      {
+        *(v_y) = gradient_search_direction*desired_velocity;
+        *(v_x) =  5.0*(start_gradient.y-(agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation())));
+        gradient_ticker++;
+      }
+      else
+      {
+        float delta_x = agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation()) - start_gradient.x;
+        float delta_y = agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation()) - start_gradient.y; 
+        std::cout << std::to_string(delta_x) << std::endl;
+        std::cout << std::to_string(delta_y) << std::endl;
+        gradient_x = (global_gas_conc-inital_gas_read)/delta_x;
+        gradient_status = 4;
+        gradient_ticker = 0;
+      }
+    break;
+
+  // generate new waypoint
+  case 4:
+    float gradient_direction;
+    iteration_start_time = simtime_seconds;
+    if (gradient_x == 0 && gradient_y == 0)
+    {
+      gradient_direction = rg.uniform_float(0,M_PI*2); // this means the gradient is unknown so in a random direction.
+      goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_travel ,.y = agent_pos.y+sinf(gradient_direction)*wp_travel}; 
+    }
+    else
+    {
+      gradient_direction = atan2f(gradient_y,gradient_x) + s.at(ID)->get_orientation() + M_PI; // for swap of coordinate systems
+      goal = {.x = agent_pos.x + cosf(gradient_direction)*wp_after_gas ,.y = agent_pos.y+sinf(gradient_direction)*wp_after_gas}; 
+    }
+
+
+  s.at(ID)->goal = goal; 
+  get_new_line();
+  update_direction(ID);
+  status = 0;
+  gradient_status = 0;
+  break;
+
+  }
+}
+
+
 void gradient_seeker::repulse_swarm(const uint16_t ID, float* v_x, float* v_y)
 {
   *(v_x) = 0;
@@ -410,6 +549,7 @@ void gradient_seeker::update_status(const uint16_t ID)
   }
 
 
+
   previous_status = status;
 
 }
@@ -460,7 +600,7 @@ void gradient_seeker::update_best_wps(const uint16_t ID)
   int x_indx = clip((int)((s.at(ID)->state[1]-environment.x_min)/(environment.x_max-environment.x_min)*(float)(environment.gas_obj.numcells[0])),0,environment.gas_obj.numcells[0]);
   int y_indx = clip((int)((s.at(ID)->state[0]-environment.y_min)/(environment.y_max-environment.y_min)*(float)(environment.gas_obj.numcells[1])),0,environment.gas_obj.numcells[1]);
   float gas_conc = (float)(environment.gas_obj.gas_data[(int)(floor(simtime_seconds))][x_indx][y_indx]);
-
+  global_gas_conc = gas_conc;
   // update best found agent position and best found swarm position if required
   if( gas_conc > s.at(ID)->best_agent_gas)
   {

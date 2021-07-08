@@ -388,7 +388,15 @@ void gradient_seeker::determine_gradient(const uint16_t ID, float* v_x, float* v
     {
       float delta_x = agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation()) - start_gradient.x;
       float delta_y = agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation()) - start_gradient.y;
-      gradient_y = (global_gas_conc-inital_gas_read)/delta_y;
+      if (delta_y != 0)
+      {
+        gradient_y = (global_gas_conc-inital_gas_read)/delta_y;
+      }
+      else
+      {
+        gradient_y = 0;
+      }
+      
       gradient_status = 2;
       gradient_ticker = 0;
     }
@@ -435,7 +443,15 @@ void gradient_seeker::determine_gradient(const uint16_t ID, float* v_x, float* v
       {
         float delta_x = agent_pos.x*cosf(s.at(ID)->get_orientation()) - agent_pos.y*sinf(s.at(ID)->get_orientation()) - start_gradient.x;
         float delta_y = agent_pos.x*sinf(s.at(ID)->get_orientation()) + agent_pos.y*cosf(s.at(ID)->get_orientation()) - start_gradient.y; 
-        gradient_x = (global_gas_conc-inital_gas_read)/delta_x;
+        if (delta_x != 0)
+        {
+          gradient_x = (global_gas_conc-inital_gas_read)/delta_x;
+        }
+        else
+        {
+          gradient_x = 0;
+        }
+        
         gradient_status = 4;
         gradient_ticker = 0;
       }

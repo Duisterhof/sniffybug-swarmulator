@@ -2,12 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+num_it = 10
 # baseline = np.loadtxt('base_new_avg_dist.txt')
-baseline_pso = np.loadtxt('../manual_dist_avg.txt')
-baseline_gradient = np.loadtxt('../gradient_seeker_avg_distance_live_gradient.txt')
-baseline_wind = np.loadtxt('../wind_seeker_avg_distance.txt')
-evolved_pso = np.loadtxt('../evolved_no_doping_dist_avg.txt')
-evolved_pso_doping = np.loadtxt('../evolved_doping_dist_avg.txt')
+baseline_pso = np.array([])
+baseline_gradient = np.array([])
+baseline_wind = np.array([])
+evolved_pso = np.array([])
+evolved_pso_doping = np.array([])
+
+for i in range(num_it):
+    baseline_pso = np.append(baseline_pso,np.loadtxt('../manual_pso_distance_'+str(i)+'.txt'))
+    baseline_gradient = np.append(baseline_gradient,np.loadtxt('../gradient_seeking_distance_'+str(i)+'.txt'))
+    baseline_wind = np.append(baseline_wind,np.loadtxt('../wind_seeking_distance_'+str(i)+'.txt'))
+    evolved_pso = np.append(evolved_pso,np.loadtxt('../no_dopoing_pso_distance_'+str(i)+'.txt'))
+    evolved_pso_doping = np.append(evolved_pso_doping,np.loadtxt('../doping_pso_distance_'+str(i)+'.txt'))
 
 print("means, times: pso, wind, gradient, evolved pso, evolved pso doping")
 print(np.mean(baseline_pso))

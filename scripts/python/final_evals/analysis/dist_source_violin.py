@@ -2,22 +2,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# # baseline = np.loadtxt('base_new_avg_dist.txt')
+# baseline = np.loadtxt('../manual_pso_distance_0.txt')
+# # evolved = np.loadtxt('evo_new_avg_dist.txt')
+# # evolved = np.loadtxt('evo_doping.txt')
+# evolved = np.loadtxt('../no_dopoing_pso_distance_0.txt')
+# evolved_doping = np.loadtxt('../doping_pso_distance_0.txt')
+num_it = 10
 # baseline = np.loadtxt('base_new_avg_dist.txt')
-baseline = np.loadtxt('../manual_dist_avg.txt')
-# evolved = np.loadtxt('evo_new_avg_dist.txt')
-# evolved = np.loadtxt('evo_doping.txt')
-evolved = np.loadtxt('../evolved_no_doping_dist_avg.txt')
-evolved_doping = np.loadtxt('../evolved_doping_dist_avg.txt')
+baseline_pso = np.array([])
+baseline_gradient = np.array([])
+baseline_wind = np.array([])
+evolved_pso = np.array([])
+evolved_pso_doping = np.array([])
 
-print("means")
-print(np.mean(baseline))
-print(np.mean(evolved))
-print(np.mean(evolved_doping))
+for i in range(num_it):
+    baseline = np.append(baseline_pso,np.loadtxt('../manual_pso_distance_'+str(i)+'.txt'))
+    evolved = np.append(evolved_pso,np.loadtxt('../no_dopoing_pso_distance_'+str(i)+'.txt'))
+    evolved_doping = np.append(evolved_pso_doping,np.loadtxt('../doping_pso_distance_'+str(i)+'.txt'))
 
-print("medians")
-print(np.median(baseline))
-print(np.median(evolved))
-print(np.median(evolved_doping))
+# print("means")
+# print(np.mean(baseline))
+# print(np.mean(evolved))
+# print(np.mean(evolved_doping))
+
+# print("medians")
+# print(np.median(baseline))
+# print(np.median(evolved))
+# print(np.median(evolved_doping))
 
 sns.set_style(style="whitegrid")
 data = [baseline,evolved,evolved_doping]

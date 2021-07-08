@@ -158,7 +158,7 @@ class swarmulator:
 		try:
 			got_fitness = False
 			num_tries = 0
-			while (num_tries < 5 and got_fitness == False):
+			while (num_tries < 25 and got_fitness == False):
 				'''Runs swarmulator. If run_id is not specified, it will assign a random id'''
 				self.run_id = random.randrange(10000000000) if run_id is None else run_id
 				pipe = "/tmp/swarmulator_" + str(self.run_id)

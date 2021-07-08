@@ -154,20 +154,24 @@ class swarmulator:
 		if self.verbose: print("Launched instance of swarmulator with %s robots and pipe ID %s" % (self.n_agents,run_id))
 
 	def run_envs(self, env, run_id=None):
-		got_fitness = False
-		num_tries = 0
-		while (num_tries < 5 and got_fitness == False):
-			'''Runs swarmulator. If run_id is not specified, it will assign a random id'''
-			self.run_id = random.randrange(10000000000) if run_id is None else run_id
-			pipe = "/tmp/swarmulator_" + str(self.run_id)
-			self._launch_envs(env,run_id=self.run_id)
-			f = self._get_fitness(pipe)
-			try:
-				test_float = float(f)
-				got_fitness = True
-			except:
-				print("swarmulator received a corrupted pipe message")
-			num_tries += 1
+		f = "try that again"
+		try:
+			got_fitness = False
+			num_tries = 0
+			while (num_tries < 5 and got_fitness == False):
+				'''Runs swarmulator. If run_id is not specified, it will assign a random id'''
+				self.run_id = random.randrange(10000000000) if run_id is None else run_id
+				pipe = "/tmp/swarmulator_" + str(self.run_id)
+				self._launch_envs(env,run_id=self.run_id)
+				f = self._get_fitness(pipe)
+				try:
+					test_float = float(f)
+					got_fitness = True
+				except:
+					print("swarmulator received a corrupted pipe message")
+				num_tries += 1
+		except:
+			print("Try that again")
 		
 		return f
 

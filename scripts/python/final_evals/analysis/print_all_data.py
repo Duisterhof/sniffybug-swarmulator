@@ -4,7 +4,7 @@ import seaborn as sns
 
 # baseline = np.loadtxt('base_new_avg_dist.txt')
 baseline_pso = np.loadtxt('../manual_dist_avg.txt')
-baseline_gradient = np.loadtxt('../gradient_seeker_avg_distance.txt')
+baseline_gradient = np.loadtxt('../gradient_seeker_avg_distance_live_gradient.txt')
 baseline_wind = np.loadtxt('../wind_seeker_avg_distance.txt')
 evolved_pso = np.loadtxt('../evolved_no_doping_dist_avg.txt')
 evolved_pso_doping = np.loadtxt('../evolved_doping_dist_avg.txt')
@@ -18,7 +18,7 @@ print(np.mean(evolved_pso_doping))
 
 # baseline = np.loadtxt('base_new_avg_dist.txt')
 baseline_pso = np.loadtxt('../manual_time.txt')
-baseline_gradient = np.loadtxt('../gradient_seeker_time.txt')
+baseline_gradient = np.loadtxt('../gradient_seeker_time_live_gradient.txt')
 baseline_wind = np.loadtxt('../wind_seeker_time.txt')
 evolved_pso = np.loadtxt('../evolved_no_doping_time.txt')
 evolved_pso_doping = np.loadtxt('../evolved_doping_time.txt')

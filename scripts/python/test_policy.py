@@ -14,7 +14,7 @@ parameters = ['final_evals/parameters/manual.txt','final_evals/parameters/no_dop
 ids = ['manual_pso','no_dopoing_pso','doping_pso','wind_seeking','gradient_seeking']
 fitnessess = ['source_first','source_distance_avg']
 
-num_it = 1
+num_it = 10
 batch_size = 5
 policy_file = "../../conf/policies/gas_params.txt"
 num_agents = 3
